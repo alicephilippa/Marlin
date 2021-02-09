@@ -1139,12 +1139,12 @@
 
 #endif // HAS_LCD_MENU
 
-#if HAS_DISPLAY
+#if ENABLED(HAS_DISPLAY)
   // The timeout (in ms) to return to the status screen from sub-menus
   //#define LCD_TIMEOUT_TO_STATUS 15000
 
   #if ENABLED(SHOW_BOOTSCREEN)
-    #define BOOTSCREEN_TIMEOUT 2000      // (ms) Total Duration to display the boot screen(s)
+    #define BOOTSCREEN_TIMEOUT 1000      // (ms) Total Duration to display the boot screen(s)
     #if EITHER(HAS_MARLINUI_U8GLIB, TFT_COLOR_UI)
       #define STATUS_HEAT_PERCENT
       #define STATUS_ALT_FAN_BITMAP
