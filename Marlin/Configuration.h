@@ -128,7 +128,7 @@
 
 // Choose the name from boards.h that matches your setup
 #ifndef MOTHERBOARD
-  #define MOTHERBOARD BOARD_MKS_ROBIN_NANO
+  #define MOTHERBOARD BOARD_MKS_ROBIN_NANO_V3
 #endif
 
 // Name displayed in the LCD "Ready" message and Info menu
@@ -2392,7 +2392,7 @@
 // 480x320, 3.5", SPI Display From MKS
 // Normally used in MKS Robin Nano V2
 //
-//#define MKS_TS35_V2_0
+#define MKS_TS35_V2_0
 
 //
 // 320x240, 2.4", FSMC Display From MKS
@@ -2404,7 +2404,7 @@
 // 320x240, 2.8", FSMC Display From MKS
 // Normally used in MKS Robin Nano V1.2
 //
-#define MKS_ROBIN_TFT28
+//#define MKS_ROBIN_TFT28
 
 //
 // 320x240, 3.2", FSMC Display From MKS
