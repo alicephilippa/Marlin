@@ -28,7 +28,7 @@
 /**
  * Marlin release version identifier
  */
-#define SHORT_BUILD_VERSION "bugfix-2.0.x"
+#define SHORT_BUILD_VERSION "bugfix-2.0.x.local"
 
 /**
  * Verbose version identifier which should contain a reference to the location
@@ -41,12 +41,12 @@
  * here we define this default string as the date where the latest release
  * version was tagged.
  */
-#define STRING_DISTRIBUTION_DATE "2021-02-01"
+#define STRING_DISTRIBUTION_DATE "2021-03-03"
 
 /**
  * Defines a generic printer name to be output to the LCD after booting Marlin.
  */
-#define MACHINE_NAME "Squishy"
+#define MACHINE_NAME "Squishy3"
 
 /**
  * The SOURCE_CODE_URL is the location where users will find the Marlin Source
@@ -59,7 +59,8 @@
 /**
  * Default generic printer UUID.
  */
-//#define DEFAULT_MACHINE_UUID "cede2a2f-41a2-4748-9b12-c55c62f367ff"
+//#define DEFAULT_MACHINE_UUID "e3a2e4b8-1756-4ab2-b392-f4ac9cb35de0"  //QQ-S pro
+#define DEFAULT_MACHINE_UUID "8d3b20a4-61ba-493c-9e44-2d3a112fe272" //Q5
 
 /**
  * The WEBSITE_URL is the location where users can get more information such as

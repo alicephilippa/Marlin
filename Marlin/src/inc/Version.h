@@ -25,7 +25,7 @@
  * Release version. Leave the Marlin version or apply a custom scheme.
  */
 #ifndef SHORT_BUILD_VERSION
-  #define SHORT_BUILD_VERSION "bugfix-2.0.x"
+  #define SHORT_BUILD_VERSION "bugfix-2.0.x.local"
 #endif
 
 /**
@@ -73,7 +73,7 @@
  * Define a generic printer name to be output to the LCD after booting Marlin.
  */
 #ifndef MACHINE_NAME
-  #define MACHINE_NAME "Squishy"
+  #define MACHINE_NAME "Squishy3"
 #endif
 
 /**
@@ -89,7 +89,8 @@
  * Default generic printer UUID.
  */
 #ifndef DEFAULT_MACHINE_UUID
-  #define DEFAULT_MACHINE_UUID "cede2a2f-41a2-4748-9b12-c55c62f367ff"
+//  #define DEFAULT_MACHINE_UUID "e3a2e4b8-1756-4ab2-b392-f4ac9cb35de0"  //QQ-S pro
+  #define DEFAULT_MACHINE_UUID "8d3b20a4-61ba-493c-9e44-2d3a112fe272" //Q5
 #endif
 
   /**
