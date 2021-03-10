@@ -1208,7 +1208,7 @@
       #define STATUS_ALT_FAN_BITMAP
       #define STATUS_ALT_BED_BITMAP
       #define BOOT_MARLIN_LOGO_ANIMATED
-      #define MARLIN_LOGO_FULL_SIZE MarlinLogo320x240x16
+      //#define MARLIN_LOGO_FULL_SIZE MarlinLogo320x240x16
       //#define BOOT_MARLIN_LOGO_SMALL     // Show a smaller Marlin logo on the Boot Screen (saving lots of flash)
     #endif
   #endif
