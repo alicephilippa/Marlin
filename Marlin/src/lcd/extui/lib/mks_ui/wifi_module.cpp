@@ -53,7 +53,7 @@
 #define WIFI_IO1_SET()      WRITE(WIFI_IO1_PIN, HIGH);
 #define WIFI_IO1_RESET()    WRITE(WIFI_IO1_PIN, LOW);
 
-extern uint8_t Explore_Disk (char* path , uint8_t recu_level);
+extern uint8_t Explore_Disk (char *path , uint8_t recu_level);
 
 extern uint8_t commands_in_queue;
 extern uint8_t sel_id;
@@ -478,7 +478,7 @@ char wait_ip_back_flag = 0;
 
 typedef struct {
   int write_index;
-  uint8_t saveFileName[30];
+  char saveFileName[30];
   uint8_t fileTransfer;
   uint32_t fileLen;
   uint32_t tick_begin;
@@ -566,7 +566,7 @@ static int cut_msg_head(uint8_t *msg, uint16_t msgLen, uint16_t cutLen) {
   return msgLen - cutLen;
 }
 
-uint8_t Explore_Disk(char* path , uint8_t recu_level) {
+uint8_t Explore_Disk(char *path , uint8_t recu_level) {
   char tmp[200];
   char Fstream[200];
 
@@ -593,7 +593,7 @@ uint8_t Explore_Disk(char* path , uint8_t recu_level) {
 }
 
 static void wifi_gcode_exec(uint8_t *cmd_line) {
-  int8_t tempBuf[100] = { 0 };
+  char tempBuf[100] = { 0 };
   uint8_t *tmpStr = 0;
   int  cmd_value;
   volatile int print_rate;
@@ -631,7 +631,7 @@ static void wifi_gcode_exec(uint8_t *cmd_line) {
             while (tmpStr[index] == ' ') index++;
 
             if (gCfgItems.wifi_type == ESP_WIFI) {
-              char *path = (char *)tempBuf;
+              char *path = tempBuf;
 
               if (strlen((char *)&tmpStr[index]) < 80) {
                 send_to_wifi((uint8_t *)"Begin file list\r\n", strlen("Begin file list\r\n"));
@@ -828,8 +828,8 @@ static void wifi_gcode_exec(uint8_t *cmd_line) {
           if ((uiCfg.print_state == WORKING) || (uiCfg.print_state == PAUSED)|| (uiCfg.print_state == REPRINTING)) {
             print_rate = uiCfg.totalSend;
             ZERO(tempBuf);
-            sprintf_P((char *)tempBuf, PSTR("M27 %d\r\n"), print_rate);
-            send_to_wifi((uint8_t *)tempBuf, strlen((char *)tempBuf));
+            sprintf_P(tempBuf, PSTR("M27 %d\r\n"), print_rate);
+            send_to_wifi((uint8_t *)tempBuf, strlen(tempBuf));
           }
           break;
 
@@ -841,15 +841,15 @@ static void wifi_gcode_exec(uint8_t *cmd_line) {
             while (tmpStr[index] == ' ') index++;
 
             if (strstr_P((char *)&tmpStr[index], PSTR(".g")) || strstr_P((char *)&tmpStr[index], PSTR(".G"))) {
-              strcpy((char *)file_writer.saveFileName, (char *)&tmpStr[index]);
+              strcpy(file_writer.saveFileName, (char *)&tmpStr[index]);
 
               if (gCfgItems.fileSysType == FILE_SYS_SD) {
                 ZERO(tempBuf);
-                sprintf_P((char *)tempBuf, PSTR("%s"), file_writer.saveFileName);
+                sprintf_P(tempBuf, PSTR("%s"), file_writer.saveFileName);
               }
               else if (gCfgItems.fileSysType == FILE_SYS_USB) {
                 ZERO(tempBuf);
-                sprintf_P((char *)tempBuf, PSTR("%s"), (char *)file_writer.saveFileName);
+                sprintf_P(tempBuf, PSTR("%s"), file_writer.saveFileName);
               }
               mount_file_sys(gCfgItems.fileSysType);
 
@@ -858,11 +858,11 @@ static void wifi_gcode_exec(uint8_t *cmd_line) {
                 card.openFileWrite(cur_name);
                 if (card.isFileOpen()) {
                   ZERO(file_writer.saveFileName);
-                  strcpy((char *)file_writer.saveFileName, (char *)&tmpStr[index]);
+                  strcpy(file_writer.saveFileName, (char *)&tmpStr[index]);
                   ZERO(tempBuf);
-                  sprintf_P((char *)tempBuf, PSTR("Writing to file: %s\r\n"), (char *)file_writer.saveFileName);
+                  sprintf_P(tempBuf, PSTR("Writing to file: %s\r\n"), file_writer.saveFileName);
                   wifi_ret_ack();
-                  send_to_wifi((uint8_t *)tempBuf, strlen((char *)tempBuf));
+                  send_to_wifi((uint8_t *)tempBuf, strlen(tempBuf));
                   wifi_link_state = WIFI_WAIT_TRANS_START;
                 }
                 else {
@@ -882,12 +882,10 @@ static void wifi_gcode_exec(uint8_t *cmd_line) {
 
             SEND_OK_TO_WIFI;
 
-            char *outBuf = (char *)tempBuf;
-            char str_1[16], tbuf[34];
+            char *outBuf = tempBuf;
+            char tbuf[34];
 
-            dtostrf(thermalManager.degHotend(0), 1, 1, tbuf);
-            strcat_P(tbuf, PSTR(" /"));
-            strcat(tbuf, dtostrf(thermalManager.degTargetHotend(0), 1, 1, str_1));
+            sprintf_P(tbuf, PSTR("%d /%d"), (int)thermalManager.degHotend(0), (int)thermalManager.degTargetHotend(0));
 
             const int tlen = strlen(tbuf);
 
@@ -897,9 +895,7 @@ static void wifi_gcode_exec(uint8_t *cmd_line) {
             strcpy_P(outBuf, PSTR(" B:"));
             outBuf += 3;
             #if HAS_HEATED_BED
-              strcpy(outBuf, dtostrf(thermalManager.temp_bed.celsius, 1, 1, str_1));
-              strcat_P(outBuf, PSTR(" /"));
-              strcat(outBuf, dtostrf(thermalManager.temp_bed.target, 1, 1, str_1));
+              sprintf_P(outBuf, PSTR("%d /%d"), (int)thermalManager.degBed(), (int)thermalManager.degTargetBed());
             #else
               strcpy_P(outBuf, PSTR("0 /0"));
             #endif
@@ -912,9 +908,7 @@ static void wifi_gcode_exec(uint8_t *cmd_line) {
             strcat_P(outBuf, PSTR(" T1:"));
             outBuf += 4;
             #if HAS_MULTI_HOTEND
-              strcat(outBuf, dtostrf(thermalManager.degHotend(1), 1, 1, str_1));
-              strcat_P(outBuf, PSTR(" /"));
-              strcat(outBuf, dtostrf(thermalManager.degTargetHotend(1), 1, 1, str_1));
+              sprintf_P(outBuf, PSTR("%d /%d"), (int)thermalManager.degHotend(1), (int)thermalManager.degTargetHotend(1));
             #else
               strcat_P(outBuf, PSTR("0 /0"));
             #endif
@@ -923,32 +917,32 @@ static void wifi_gcode_exec(uint8_t *cmd_line) {
             strcat_P(outBuf, PSTR(" @:0 B@:0\r\n"));
           }
           else {
-            sprintf_P((char *)tempBuf, PSTR("T:%d /%d B:%d /%d T0:%d /%d T1:%d /%d @:0 B@:0\r\n"),
-              (int)thermalManager.degHotend(0), (int)thermalManager.degTargetHotend(0),
+            sprintf_P(tempBuf, PSTR("T:%d /%d B:%d /%d T0:%d /%d T1:%d /%d @:0 B@:0\r\n"),
+              thermalManager.degHotend(0), thermalManager.degTargetHotend(0),
               #if HAS_HEATED_BED
-                (int)thermalManager.temp_bed.celsius, (int)thermalManager.temp_bed.target,
+                thermalManager.degBed(), thermalManager.degTargetBed(),
               #else
                 0, 0,
               #endif
-              (int)thermalManager.degHotend(0), (int)thermalManager.degTargetHotend(0),
+              thermalManager.degHotend(0), thermalManager.degTargetHotend(0),
               #if HAS_MULTI_HOTEND
-                (int)thermalManager.degHotend(1), (int)thermalManager.degTargetHotend(1)
+                thermalManager.degHotend(1), thermalManager.degTargetHotend(1)
               #else
                 0, 0
               #endif
             );
           }
 
-          send_to_wifi((uint8_t *)tempBuf, strlen((char *)tempBuf));
+          send_to_wifi((uint8_t *)tempBuf, strlen(tempBuf));
           queue.enqueue_one_P(PSTR("M105"));
           break;
 
         case 992:
           if ((uiCfg.print_state == WORKING) || (uiCfg.print_state == PAUSED)) {
             ZERO(tempBuf);
-            sprintf_P((char *)tempBuf, PSTR("M992 %d%d:%d%d:%d%d\r\n"), print_time.hours/10, print_time.hours%10, print_time.minutes/10, print_time.minutes%10, print_time.seconds/10, print_time.seconds%10);
+            sprintf_P(tempBuf, PSTR("M992 %d%d:%d%d:%d%d\r\n"), print_time.hours/10, print_time.hours%10, print_time.minutes/10, print_time.minutes%10, print_time.seconds/10, print_time.seconds%10);
             wifi_ret_ack();
-            send_to_wifi((uint8_t *)tempBuf, strlen((char *)tempBuf));
+            send_to_wifi((uint8_t *)tempBuf, strlen(tempBuf));
           }
           break;
 
@@ -956,9 +950,9 @@ static void wifi_gcode_exec(uint8_t *cmd_line) {
           if ((uiCfg.print_state == WORKING) || (uiCfg.print_state == PAUSED)) {
             ZERO(tempBuf);
             if (strlen((char *)list_file.file_name[sel_id]) > (100 - 1)) return;
-            sprintf_P((char *)tempBuf, PSTR("M994 %s;%d\n"), list_file.file_name[sel_id], (int)gCfgItems.curFilesize);
+            sprintf_P(tempBuf, PSTR("M994 %s;%d\n"), list_file.file_name[sel_id], (int)gCfgItems.curFilesize);
             wifi_ret_ack();
-            send_to_wifi((uint8_t *)tempBuf, strlen((char *)tempBuf));
+            send_to_wifi((uint8_t *)tempBuf, strlen(tempBuf));
           }
           break;
 
@@ -1285,7 +1279,7 @@ static void file_first_msg_handle(uint8_t * msg, uint16_t msgLen) {
 
   ZERO(public_buf);
 
-  if (strlen((const char *)file_writer.saveFileName) > sizeof(saveFilePath))
+  if (strlen(file_writer.saveFileName) > sizeof(saveFilePath))
     return;
 
   ZERO(saveFilePath);
@@ -1309,9 +1303,9 @@ static void file_first_msg_handle(uint8_t * msg, uint16_t msgLen) {
 
   #if ENABLED(SDSUPPORT)
 
-    uint8_t dosName[FILENAME_LENGTH];
+    char dosName[FILENAME_LENGTH];
 
-    if (!longName2DosName((const char *)file_writer.saveFileName,dosName)) {
+    if (!longName2DosName(file_writer.saveFileName, dosName)) {
       clear_cur_ui();
       upload_result = 2;
       wifiTransError.flag = 1;
@@ -1319,7 +1313,7 @@ static void file_first_msg_handle(uint8_t * msg, uint16_t msgLen) {
       lv_draw_dialog(DIALOG_TYPE_UPLOAD_FILE);
       return;
     }
-    sprintf_P((char *)saveFilePath, PSTR("%s"), dosName);
+    strcpy(saveFilePath, dosName);
 
     card.cdroot();
     upload_file.close();
