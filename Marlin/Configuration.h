@@ -130,6 +130,16 @@
   #define MOTHERBOARD BOARD_MKS_ROBIN_NANO
 #endif
 
+#define LIN_ADVANCE                 //(L) with K=0 For TMC_UART prefer mode spreadCycle(by TFT menu) or commented if problem (Default)
+#define ARC_SUPPORT                 //(R) (Default)
+//#define POWER_LOSS_RECOVERY         // Continue print after Power-Loss.(Defaul_QQS)
+//#define EXTRUDER_STEPS 422          //TITAN
+//#define Z_OFFSET -18      
+#define ESP_WIFI  
+#if ENABLED(ESP_WIFI)
+    #define NUM_SERIAL 2            //MKS WIFI
+#endif
+
 // Name displayed in the LCD "Ready" message and Info menu
 //#define CUSTOM_MACHINE_NAME "Squishy"
 
@@ -627,7 +637,7 @@
  * Note: For Bowden Extruders make this large enough to allow load/unload.
  */
 #define PREVENT_LENGTHY_EXTRUDE
-#define EXTRUDE_MAXLENGTH 600
+#define EXTRUDE_MAXLENGTH 550
 
 //===========================================================================
 //======================== Thermal Runaway Protection =======================
@@ -1761,21 +1771,27 @@
 // Preheat Constants
 #define PREHEAT_1_LABEL       "PLA/PLA+"
 #define PREHEAT_1_TEMP_HOTEND 200
-#define PREHEAT_1_TEMP_BED     60
+#define PREHEAT_1_TEMP_BED     50
 #define PREHEAT_1_TEMP_CHAMBER 35
 #define PREHEAT_1_FAN_SPEED     0 // Value from 0 to 255
 
 #define PREHEAT_2_LABEL       "PETG"
-#define PREHEAT_2_TEMP_HOTEND 215
+#define PREHEAT_2_TEMP_HOTEND 235
 #define PREHEAT_2_TEMP_BED     70
 #define PREHEAT_1_TEMP_CHAMBER 35
 #define PREHEAT_2_FAN_SPEED     0 // Value from 0 to 255
 
 #define PREHEAT_3_LABEL       "ABS"
 #define PREHEAT_3_TEMP_HOTEND 245
-#define PREHEAT_3_TEMP_BED    110
+#define PREHEAT_3_TEMP_BED     90
 #define PREHEAT_1_TEMP_CHAMBER 35
 #define PREHEAT_3_FAN_SPEED     0 // Value from 0 to 255
+
+#define PREHEAT_4_LABEL       "TPU"
+#define PREHEAT_4_TEMP_HOTEND 230
+#define PREHEAT_4_TEMP_BED     50
+#define PREHEAT_4_FAN_SPEED     0 // Value from 0 to 255
+
 
 /**
  * Nozzle Park
