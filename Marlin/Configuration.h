@@ -132,8 +132,8 @@
 
 #define LIN_ADVANCE                 //(L) with K=0 For TMC_UART prefer mode spreadCycle(by TFT menu) or commented if problem (Default)
 #define ARC_SUPPORT                 //(R) (Default)
-#define POWER_LOSS_RECOVERY         // Continue print after Power-Loss.(Defaul_QQS)
-#define EXTRUDER_STEPS 422          //TITAN
+//#define POWER_LOSS_RECOVERY         // Continue print after Power-Loss.(Defaul_QQS)
+//#define EXTRUDER_STEPS 422          //TITAN
 #define Z_OFFSET -18      
 #define ESP_WIFI  
 #if ENABLED(ESP_WIFI)
@@ -716,13 +716,17 @@
   #endif
 
   // Print surface diameter/2 minus unreachable space (avoid collisions with vertical towers).
-  #define DELTA_PRINTABLE_RADIUS 213.0   // (mm)
+    #define DELTA_PRINTABLE_RADIUS 130.0    // (mm)
 
-  // Center-to-center distance of the holes in the diagonal push rods.
-  #define DELTA_DIAGONAL_ROD 280.0        // (mm)
+    // Center-to-center distance of the holes in the diagonal push rods.
+    #define DELTA_DIAGONAL_ROD 280.0        // (mm)
 
-  // Distance between bed and nozzle Z home position
-  #define DELTA_HEIGHT 370.0             // (mm) Get this value from G33 auto calibrate
+    // Horizontal distance bridged by diagonal push rods when effector is centered.
+    #define DELTA_RADIUS 140.8               // (mm) Get this value from G33 auto calibrate
+
+    // Distance between bed and nozzle Z home position
+    #define DELTA_HEIGHT 370.00                 //370 E3D-360 (mm) Get this value from G33 auto calibrate
+
 
   #define DELTA_ENDSTOP_ADJ { -0.49, -1.4, 0.0 } // Get these values from G33 auto calibrate
 
@@ -735,7 +739,7 @@
   #define DELTA_TOWER_ANGLE_TRIM { 0, 0, 0 } // Get these values from G33 auto calibrate
 
   // Delta radius and diagonal rod adjustments (mm)
-  //#define DELTA_RADIUS_TRIM_TOWER { 0.0, 0.0, 0.0 }
+  #define DELTA_RADIUS_TRIM_TOWER { 0.0, 0.0, 0.0 }
   #define DELTA_DIAGONAL_ROD_TRIM_TOWER { 0, 0.0, 0 }
 
 #endif
@@ -904,7 +908,7 @@
 
 //#define LIMITED_MAX_ACCEL_EDITING     // Limit edit via M201 or LCD to DEFAULT_MAX_ACCELERATION * 2
 #if ENABLED(LIMITED_MAX_ACCEL_EDITING)
-  #define MAX_ACCEL_EDIT_VALUES       { 6000, 6000, 200, 20000 } // ...or, set your own edit limits
+  #define MAX_ACCEL_EDIT_VALUES       { 6000, 6000, 6000, 20000 } // ...or, set your own edit limits
 #endif
 
 /**
@@ -2638,7 +2642,7 @@
  *   TFT_ROTATE_270, TFT_ROTATE_270_MIRROR_X, TFT_ROTATE_270_MIRROR_Y,
  *   TFT_MIRROR_X, TFT_MIRROR_Y, TFT_NO_ROTATION
  */
-//#define TFT_ROTATION TFT_ROTATE_180
+#define TFT_ROTATION TFT_NO_ROTATION
 
 //=============================================================================
 //============================  Other Controllers  ============================
