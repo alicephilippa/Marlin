@@ -130,22 +130,22 @@
   #define MOTHERBOARD BOARD_MKS_ROBIN_NANO
 #endif
 
-#define LIN_ADVANCE                 //(L) with K=0 For TMC_UART prefer mode spreadCycle(by TFT menu) or commented if problem (Default)
-#define ARC_SUPPORT                 //(R) (Default)
-//#define POWER_LOSS_RECOVERY         // Continue print after Power-Loss.(Defaul_QQS)
-//#define EXTRUDER_STEPS 422          //TITAN
-//#define Z_OFFSET -18      
+#define LIN_ADVANCE                 // (L) with K=0 For TMC_UART prefer mode spreadCycle(by TFT menu) or commented if problem (Default)
+#define ARC_SUPPORT                 // (R) (Default)
+//#define POWER_LOSS_RECOVERY       // Continue print after Power-Loss.(Defaul_QQS)
+#define EXTRUDER_STEPS 138.1        // Creality MK8
+#define Z_OFFSET -19.91      
 #define ESP_WIFI  
 #if ENABLED(ESP_WIFI)
-    #define NUM_SERIAL 2            //MKS WIFI
+    #define NUM_SERIAL 2            // MKS WIFI
 #endif
 
 // Name displayed in the LCD "Ready" message and Info menu
-//#define CUSTOM_MACHINE_NAME "Squishy"
+// #define CUSTOM_MACHINE_NAME "Squishy"
 
 // Printer's unique ID, used by some programs to differentiate between machines.
 // Choose your own or use a service like https://www.uuidgenerator.net/version4
-//#define MACHINE_UUID "0966cb7b-997d-450e-828c-b0b63b6b81b8"
+// #define MACHINE_UUID "0966cb7b-997d-450e-828c-b0b63b6b81b8"
 
 // @section extruder
 
@@ -157,13 +157,13 @@
 #define DEFAULT_NOMINAL_FILAMENT_DIA 1.75
 
 // For Cyclops or any "multi-extruder" that shares a single nozzle.
-//#define SINGLENOZZLE
+// #define SINGLENOZZLE
 
 // Save and restore temperature and fan speed on tool-change.
 // Set standby for the unselected tool with M104/106/109 T...
 #if ENABLED(SINGLENOZZLE)
-  //#define SINGLENOZZLE_STANDBY_TEMP
-  //#define SINGLENOZZLE_STANDBY_FAN
+  // #define SINGLENOZZLE_STANDBY_TEMP
+  // #define SINGLENOZZLE_STANDBY_FAN
 #endif
 
 /**
@@ -475,15 +475,15 @@
 // Above this temperature the heater will be switched off.
 // This can protect components from overheating, but NOT from shorts and failures.
 // (Use MINTEMP for thermistor short/failure protection.)
-#define HEATER_0_MAXTEMP 280
-#define HEATER_1_MAXTEMP 280
-#define HEATER_2_MAXTEMP 280
-#define HEATER_3_MAXTEMP 280
-#define HEATER_4_MAXTEMP 280
-#define HEATER_5_MAXTEMP 280
-#define HEATER_6_MAXTEMP 280
-#define HEATER_7_MAXTEMP 280
-#define BED_MAXTEMP      150
+#define HEATER_0_MAXTEMP 275
+#define HEATER_1_MAXTEMP 275
+#define HEATER_2_MAXTEMP 275
+#define HEATER_3_MAXTEMP 275
+#define HEATER_4_MAXTEMP 275
+#define HEATER_5_MAXTEMP 275
+#define HEATER_6_MAXTEMP 275
+#define HEATER_7_MAXTEMP 275
+#define BED_MAXTEMP      130
 #define CHAMBER_MAXTEMP  60
 
 /**
@@ -520,9 +520,14 @@
     #define DEFAULT_Ki_LIST {   1.08,   1.08 }
     #define DEFAULT_Kd_LIST { 114.00, 114.00 }
   #else
-    #define DEFAULT_Kp  11.70
-    #define DEFAULT_Ki   0.65
-    #define DEFAULT_Kd  54.40
+    // #define DEFAULT_Kp  11.70
+    // #define DEFAULT_Ki   0.65
+    // #define DEFAULT_Kd  54.40
+
+    #define DEFAULT_Kp 10.70
+    #define DEFAULT_Ki 0.58
+    #define DEFAULT_Kd 49.53
+
   #endif
 #endif // PIDTEMP
 
@@ -561,9 +566,14 @@
 
   // 120V 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
   // from FOPDT model - kp=.39 Tp=405 Tdead=66, Tc set to 79.2, aggressive factor of .15 (vs .1, 1, 10)
-  #define DEFAULT_bedKp  33.50
-  #define DEFAULT_bedKi   5.97
-  #define DEFAULT_bedKd 124.40
+  // #define DEFAULT_bedKp  33.50
+  // #define DEFAULT_bedKi   5.97
+  // #define DEFAULT_bedKd 124.40
+
+  #define DEFAULT_bedKp 34.53
+  #define DEFAULT_bedKi 6.33
+  #define DEFAULT_bedKd 125.51
+
 
   // FIND YOUR OWN: "M303 E-1 C8 S90" to run autotune on the bed at 90 degreesC for 8 cycles.
 #endif // PIDTEMPBED
@@ -871,7 +881,7 @@
  *                                      X, Y, Z, E0 [, E1[, E2...]]
  */
 // variables to calculate steps
-#define XYZ_FULL_STEPS_PER_ROTATION (360/1.8)
+#define XYZ_FULL_STEPS_PER_ROTATION 200
 #define XYZ_MICROSTEPS 16
 #define XYZ_BELT_PITCH 2
 #define XYZ_PULLEY_TEETH 20
@@ -1127,7 +1137,7 @@
  *     |    [-]    |
  *     O-- FRONT --+
  */
-#define NOZZLE_TO_PROBE_OFFSET { -2, -3.46, -17.16 }
+#define NOZZLE_TO_PROBE_OFFSET { -2, -3.46, -19.91 }
 
 // Most probes should stay away from the edges of the bed, but
 // with NOZZLE_AS_PROBE this can be negative for a wider probing area.
@@ -2535,7 +2545,7 @@
 // 320x240, 2.4", FSMC Display From MKS
 // Normally used in MKS Robin Nano V1.2
 //
-#define MKS_ROBIN_TFT24
+//#define MKS_ROBIN_TFT24
 
 //
 // 320x240, 2.8", FSMC Display From MKS
@@ -2547,7 +2557,7 @@
 // 320x240, 3.2", FSMC Display From MKS
 // Normally used in MKS Robin Nano V1.2
 //
-//#define MKS_ROBIN_TFT32
+#define MKS_ROBIN_TFT32
 
 //
 // 480x320, 3.5", FSMC Display From MKS
