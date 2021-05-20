@@ -133,7 +133,6 @@
 #define LIN_ADVANCE                 //(L) with K=0 For TMC_UART prefer mode spreadCycle(by TFT menu) or commented if problem (Default)
 #define ARC_SUPPORT                 //(R) (Default)
 //#define POWER_LOSS_RECOVERY         // Continue print after Power-Loss.(Defaul_QQS)
-#define EXTRUDER_STEPS 422          //TITAN
 #define Z_OFFSET -18      
 #define ESP_WIFI  
 #if ENABLED(ESP_WIFI)
@@ -881,10 +880,11 @@
 #define XYZ_MICROSTEPS 16
 #define XYZ_BELT_PITCH 2
 #define XYZ_PULLEY_TEETH 16
+#define EXTRUDER_STEPS 422          //TITAN
 
 // delta speeds must be the same on xyz
 #define DEFAULT_XYZ_STEPS_PER_UNIT ((XYZ_FULL_STEPS_PER_ROTATION) * (XYZ_MICROSTEPS) / double(XYZ_BELT_PITCH) / double(XYZ_PULLEY_TEETH))
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { DEFAULT_XYZ_STEPS_PER_UNIT, DEFAULT_XYZ_STEPS_PER_UNIT, DEFAULT_XYZ_STEPS_PER_UNIT, 400 }
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { DEFAULT_XYZ_STEPS_PER_UNIT, DEFAULT_XYZ_STEPS_PER_UNIT, DEFAULT_XYZ_STEPS_PER_UNIT, EXTRUDER_STEPS }
 
  
  /* Default Max Feed Rate (mm/s)
