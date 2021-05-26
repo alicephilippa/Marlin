@@ -42,7 +42,7 @@
  * version was tagged.
  */
 #ifndef STRING_DISTRIBUTION_DATE
-  #define STRING_DISTRIBUTION_DATE "2021-05-25"
+  #define STRING_DISTRIBUTION_DATE "2021-05-26"
 #endif
 
 /**
@@ -73,7 +73,7 @@
  * Define a generic printer name to be output to the LCD after booting Marlin.
  */
 #ifndef MACHINE_NAME
-  #define MACHINE_NAME "Squishy"
+  #define MACHINE_NAME "Squishy3"
 #endif
 
 /**
@@ -89,7 +89,7 @@
  * Default generic printer UUID.
  */
 #ifndef DEFAULT_MACHINE_UUID
-  #define DEFAULT_MACHINE_UUID "cede2a2f-41a2-4748-9b12-c55c62f367ff"
+  #define DEFAULT_MACHINE_UUID "8d3b20a4-61ba-493c-9e44-2d3a112fe272" //Q5
 #endif
 
   /**
