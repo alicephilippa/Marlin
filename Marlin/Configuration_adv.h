@@ -1659,8 +1659,8 @@
 #if ANY(DOGLCD, TFT_COLOR_UI, TOUCH_UI_FTDI_EVE)
   #define LCD_LANGUAGE_2 fr
   #define LCD_LANGUAGE_3 sv
-  //#define LCD_LANGUAGE_4 es
-  //#define LCD_LANGUAGE_5 de
+  #define LCD_LANGUAGE_4 es
+  #define LCD_LANGUAGE_5 de
   #ifdef LCD_LANGUAGE_2
     #define LCD_LANGUAGE_AUTO_SAVE // Automatically save language to EEPROM on change
   #endif
@@ -2573,7 +2573,7 @@
   #endif
 
   #if AXIS_IS_TMC(E0)
-    #define E0_CURRENT      800
+    #define E0_CURRENT      900
     #define E0_MICROSTEPS    16
     #define E0_RSENSE         0.11
     #define E0_CHAIN_POS     -1
@@ -2853,7 +2853,7 @@
    * Enable M122 debugging command for TMC stepper drivers.
    * M122 S0/1 will enable continuous reporting.
    */
-  //#define TMC_DEBUG
+  #define TMC_DEBUG
 
   /**
    * You can set your own advanced settings by filling in predefined functions.
