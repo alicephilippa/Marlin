@@ -123,8 +123,8 @@
  * Currently Ethernet (-2) is only supported on Teensy 4.1 boards.
  * :[-2, -1, 0, 1, 2, 3, 4, 5, 6, 7]
  */
-#define SERIAL_PORT_2 -1
-#define BAUDRATE_2 250000   // Enable to override BAUDRATE
+//#define SERIAL_PORT_2 -1
+//#define BAUDRATE_2 250000   // Enable to override BAUDRATE
 
 /**
  * Select a third serial port on the board to use for communication with the host.
@@ -147,8 +147,18 @@
 //#define POWER_LOSS_RECOVERY         // Continue print after Power-Loss.(Defaul_QQS)
 #define Z_OFFSET -18      
 #define ESP_WIFI  
-#if ENABLED(ESP_WIFI)
-    #define NUM_SERIAL 2            //MKS WIFI
+#ifdef ESP_WIFI
+  #ifdef ESP3D_30
+    #define SERIAL_PORT_2 1
+    #define NUM_SERIAL 2
+    #define BAUDRATE_2 115200
+  #else
+    #define SERIAL_PORT_2 1
+    #define NUM_SERIAL 2
+    #define BAUDRATE_2 250000
+  #endif
+#else
+  #define BAUDRATE_2 250000
 #endif
 
 
