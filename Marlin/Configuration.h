@@ -105,13 +105,6 @@
 #define SERIAL_PORT 3
 
 /**
- * Select a secondary serial port on the board to use for communication with the host.
- * Currently Ethernet (-2) is only supported on Teensy 4.1 boards.
- * :[-2, -1, 0, 1, 2, 3, 4, 5, 6, 7]
- */
-#define SERIAL_PORT_2 1
-
-/**
  * Serial Port Baud Rate
  * This is the default communication speed for all serial ports.
  * Set the baud rate defaults for additional serial ports below.
@@ -152,17 +145,26 @@
 #define LIN_ADVANCE                 //(L) with K=0 For TMC_UART prefer mode spreadCycle(by TFT menu) or commented if problem (Default)
 #define ARC_SUPPORT                 //(R) (Default)
 //#define POWER_LOSS_RECOVERY         // Continue print after Power-Loss.(Defaul_QQS)
-//#define EXTRUDER_STEPS 422          //TITAN
 #define Z_OFFSET -18      
 #define ESP_WIFI  
-#if ENABLED(ESP_WIFI)
-    #define NUM_SERIAL 2            //MKS WIFI
+#ifdef ESP_WIFI
+  #ifdef ESP3D_30
+    #define SERIAL_PORT_2 1
+    #define NUM_SERIAL 2
+    #define BAUDRATE_2 115200
+  #else
+    #define SERIAL_PORT_2 1
+    #define NUM_SERIAL 2
+    #define BAUDRATE_2 250000
+  #endif
+#else
+  #define BAUDRATE_2 250000
 #endif
 
 
 
 // Name displayed in the LCD "Ready" message and Info menu
-//#define CUSTOM_MACHINE_NAME "Squishy"
+//#define CUSTOM_MACHINE_NAME "Squashy"
 
 // Printer's unique ID, used by some programs to differentiate between machines.
 // Choose your own or use a service like https://www.uuidgenerator.net/version4
@@ -984,10 +986,11 @@
 #define XYZ_MICROSTEPS 16
 #define XYZ_BELT_PITCH 2
 #define XYZ_PULLEY_TEETH 16
+#define EXTRUDER_STEPS 422          //TITAN
 
 // delta speeds must be the same on xyz
 #define DEFAULT_XYZ_STEPS_PER_UNIT ((XYZ_FULL_STEPS_PER_ROTATION) * (XYZ_MICROSTEPS) / double(XYZ_BELT_PITCH) / double(XYZ_PULLEY_TEETH))
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { DEFAULT_XYZ_STEPS_PER_UNIT, DEFAULT_XYZ_STEPS_PER_UNIT, DEFAULT_XYZ_STEPS_PER_UNIT, 400 }
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { DEFAULT_XYZ_STEPS_PER_UNIT, DEFAULT_XYZ_STEPS_PER_UNIT, DEFAULT_XYZ_STEPS_PER_UNIT, EXTRUDER_STEPS }
 
  
  /* Default Max Feed Rate (mm/s)
@@ -1391,7 +1394,7 @@
 // @section extruder
 
 // For direct drive extruder v9 set to true, for geared extruder set to false.
-#define INVERT_E0_DIR false
+#define INVERT_E0_DIR true
 #define INVERT_E1_DIR false
 #define INVERT_E2_DIR false
 #define INVERT_E3_DIR false
@@ -2799,7 +2802,7 @@
 //#define DWIN_CREALITY_LCD
 
 //
-// Touch Screen Settings
+// ADS7843/XPT2046 ADC Touchscreen such as ILI9341 2.8
 //
 #define TOUCH_SCREEN
 #if ENABLED(TOUCH_SCREEN)
