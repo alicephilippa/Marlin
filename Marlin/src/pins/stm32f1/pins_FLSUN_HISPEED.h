@@ -275,10 +275,10 @@
 // TFT with FSMC interface
 //
 
-#if HAS_FSMC_TFT || HAS_GRAPHICAL_TFT
-  #define TFT_CS_PIN                        PD7   // NE4
-  #define TFT_RS_PIN                        PD11  // A0
-#endif
+//#if HAS_FSMC_TFT || HAS_GRAPHICAL_TFT
+//  #define TFT_CS_PIN                        PD7   // NE4
+//  #define TFT_RS_PIN                        PD11  // A0
+//#endif
 
 #if HAS_FSMC_TFT
   /**
