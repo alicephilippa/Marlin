@@ -2715,7 +2715,7 @@
 // 320x240, 2.8", FSMC Display From MKS
 // Normally used in MKS Robin Nano V1.2
 //
-//#define MKS_ROBIN_TFT28
+#define MKS_ROBIN_TFT28
 
 //
 // 320x240, 3.2", FSMC Display From MKS
@@ -2738,7 +2738,7 @@
 // 320x240, 3.2", FSMC Display From MKS
 // Normally used in MKS Robin
 //
-#define MKS_ROBIN_TFT_V1_1R
+// #define MKS_ROBIN_TFT_V1_1R
 
 //
 // 480x320, 3.5", FSMC Stock Display from TronxXY
