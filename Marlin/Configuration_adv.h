@@ -1371,7 +1371,7 @@
 
   #define SD_MENU_CONFIRM_START             // Confirm the selected SD file before printing
 
-  //#define NO_SD_AUTOSTART                 // Remove auto#.g file support completely to save some Flash, SRAM
+  #define NO_SD_AUTOSTART                 // Remove auto#.g file support completely to save some Flash, SRAM
   //#define MENU_ADDAUTOSTART               // Add a menu option to run auto#.g files
 
   //#define BROWSE_MEDIA_ON_INSERT          // Open the file browser when media is inserted
@@ -1589,7 +1589,7 @@
  */
 #if HAS_MARLINUI_U8GLIB
   // Show SD percentage next to the progress bar
-  //#define DOGM_SD_PERCENT
+  #define DOGM_SD_PERCENT
 
   // Save many cycles by drawing a hollow frame or no frame on the Info Screen
   //#define XYZ_NO_FRAME
@@ -1649,7 +1649,7 @@
   #define STATUS_ALT_FAN_BITMAP     // Use the alternative fan bitmap
   #define STATUS_FAN_FRAMES 4       // :[0,1,2,3,4] Number of fan animation frames
   #define STATUS_HEAT_PERCENT       // Show heating in a progress bar
-  #define BOOT_MARLIN_LOGO_ANIMATED // Animated Marlin logo. Costs ~‭3260 (or ~940) bytes of PROGMEM.
+  //#define BOOT_MARLIN_LOGO_ANIMATED // Animated Marlin logo. Costs ~‭3260 (or ~940) bytes of PROGMEM.
 
   // Frivolous Game Options
   //#define MARLIN_BRICKOUT
@@ -2182,7 +2182,7 @@
 // Without XON/XOFF flow control (see SERIAL_XON_XOFF below) 32 bytes should be enough.
 // To use flow control, set this buffer size to at least 1024 bytes.
 // :[0, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048]
-#define RX_BUFFER_SIZE 1024
+#define RX_BUFFER_SIZE 512
 
 #if RX_BUFFER_SIZE >= 1024
   // Enable to have the controller send XON/XOFF control characters to
