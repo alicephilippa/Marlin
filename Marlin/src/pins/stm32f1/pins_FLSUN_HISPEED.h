@@ -92,10 +92,6 @@
 #define Z_MIN_PIN                           PA11  // -Z
 #define Z_MAX_PIN                           PC4   // +Z
 
-#ifndef FIL_RUNOUT_PIN
-  #define FIL_RUNOUT_PIN            MT_DET_1_PIN
-#endif
-
 //
 // Steppers
 //
@@ -228,6 +224,10 @@
   #define MT_DET_PIN_STATE                  LOW
 #endif
 
+#ifndef FIL_RUNOUT_PIN
+  #define FIL_RUNOUT_PIN            PA4
+#endif
+
 //
 // LED / NEOPixel
 //
@@ -277,12 +277,6 @@
 //
 // TFT with FSMC interface
 //
-
-//#if HAS_FSMC_TFT || HAS_GRAPHICAL_TFT
-//  #define TFT_CS_PIN                        PD7   // NE4
-//  #define TFT_RS_PIN                        PD11  // A0
-//#endif
-
 #if HAS_FSMC_TFT
   /**
    * Note: MKS Robin TFT screens use various TFT controllers
@@ -305,8 +299,8 @@
   #define FSMC_DMA_DEV                      DMA2
   #define FSMC_DMA_CHANNEL               DMA_CH5
 
-  #define TFT_CS_PIN                 FSMC_CS_PIN
-  #define TFT_RS_PIN                 FSMC_RS_PIN
+  #define TFT_CS_PIN                  FSMC_CS_PIN
+  #define TFT_RS_PIN                  FSMC_RS_PIN
 
   #ifdef TFT_CLASSIC_UI
     #define TFT_MARLINBG_COLOR            0x3186  // Grey
