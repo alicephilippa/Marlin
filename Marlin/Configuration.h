@@ -134,7 +134,7 @@
 #define ARC_SUPPORT                 // (R) (Default)
 //#define POWER_LOSS_RECOVERY       // Continue print after Power-Loss.(Defaul_QQS)
 #define EXTRUDER_STEPS 138.1        // Creality MK8
-#define Z_OFFSET -19.91      
+#define Z_OFFSET -20.06      
 #define ESP_WIFI  
 #if ENABLED(ESP_WIFI)
     #define NUM_SERIAL 2            // MKS WIFI
