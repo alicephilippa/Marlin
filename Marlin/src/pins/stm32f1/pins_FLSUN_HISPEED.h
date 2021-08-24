@@ -225,7 +225,7 @@
 #endif
 
 #ifndef FIL_RUNOUT_PIN
-  #define FIL_RUNOUT_PIN            PA4
+  #define FIL_RUNOUT_PIN                    PA4
 #endif
 
 //
