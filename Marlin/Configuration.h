@@ -1008,10 +1008,10 @@
  */
 // variables to calculate steps
 #define XYZ_FULL_STEPS_PER_ROTATION (360/1.8)
-#define XYZ_MICROSTEPS 16
-#define XYZ_BELT_PITCH 2
-#define XYZ_PULLEY_TEETH 16
-#define EXTRUDER_STEPS 422          //TITAN
+#define XYZ_MICROSTEPS              16
+#define XYZ_BELT_PITCH               2
+#define XYZ_PULLEY_TEETH            16
+#define EXTRUDER_STEPS             411.7          //TITAN
 
 // delta speeds must be the same on xyz
 #define DEFAULT_XYZ_STEPS_PER_UNIT ((XYZ_FULL_STEPS_PER_ROTATION) * (XYZ_MICROSTEPS) / double(XYZ_BELT_PITCH) / double(XYZ_PULLEY_TEETH))

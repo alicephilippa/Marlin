@@ -23,7 +23,7 @@
 
 /**
  * FLSUN HiSpeed V1 (STM32F103VET6) board pin assignments
- * FLSun Hispeed (clone MKS_Robin_miniV2) board.
+ * FLSun Hispeed (clone MKS_Robin_mini V2) board.
  *
  * MKS Robin Mini USB uses UART3 (PB10-TX, PB11-RX)
  * #define SERIAL_PORT_2 3
@@ -32,11 +32,11 @@
 #if NOT_TARGET(__STM32F1__, STM32F1xx)
   #error "Oops! Select an STM32F1 board in 'Tools > Board.'"
 #elif HOTENDS > 1 || E_STEPPERS > 1
-  #error "FLSUN HiSpeedV1 only supports one hotend / E-stepper. Comment out this line to continue."
+  #error "FLSUN HiSpeed V1 only supports one hotend / E-stepper. Comment out this line to continue."
 #endif
 
-#define BOARD_INFO_NAME      "FLSun HiSpeedV1"
-#define BOARD_WEBSITE_URL    "github.com/Foxies-CSTL"
+#define BOARD_INFO_NAME      "FLSun HiSpeed V1"
+//#define BOARD_WEBSITE_URL    "github.com/Foxies-CSTL"
 
 #define BOARD_NO_NATIVE_USB
 
