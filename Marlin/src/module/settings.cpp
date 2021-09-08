@@ -36,7 +36,7 @@
  */
 
 // Change EEPROM version if the structure changes
-#define EEPROM_VERSION "V83"
+#define EEPROM_VERSION "V84"
 #define EEPROM_OFFSET 100
 
 // Check the integrity of data offsets.
@@ -71,6 +71,10 @@
 
 #if ENABLED(EXTENSIBLE_UI)
   #include "../lcd/extui/ui_api.h"
+#elif ENABLED(DWIN_CREALITY_LCD_ENHANCED)
+  #include "../lcd/e3v2/enhanced/dwin.h"
+#elif ENABLED(DWIN_CREALITY_LCD_JYERSUI)
+  #include "../lcd/e3v2/jyersui/dwin.h"
 #endif
 
 #if HAS_SERVOS
@@ -130,7 +134,7 @@
 
 #include "../feature/controllerfan.h"
 #if ENABLED(CONTROLLER_FAN_EDITABLE)
-  void M710_report(const bool forReplay);
+  void M710_report(const bool forReplay=true);
 #endif
 
 #if ENABLED(CASE_LIGHT_ENABLE)
@@ -166,6 +170,10 @@
   void M552_report();
   void M553_report();
   void M554_report();
+#endif
+
+#if EITHER(DELTA, HAS_EXTRA_ENDSTOPS)
+  void M666_report(const bool forReplay=true);
 #endif
 
 #define _EN_ITEM(N) , E##N
@@ -350,6 +358,11 @@ typedef struct SettingsDataStruct {
   int16_t lcd_contrast;                                 // M250 C
 
   //
+  // HAS_LCD_BRIGHTNESS
+  //
+  uint8_t lcd_brightness;                               // M256 B
+
+  //
   // Controller fan settings
   //
   controllerFan_settings_t controllerFan_settings;      // M710
@@ -428,8 +441,16 @@ typedef struct SettingsDataStruct {
   // EXTENSIBLE_UI
   //
   #if ENABLED(EXTENSIBLE_UI)
-    // This is a significant hardware change; don't reserve space when not present
     uint8_t extui_data[ExtUI::eeprom_data_size];
+  #endif
+
+  //
+  // Ender-3 V2 DWIN
+  //
+  #if ENABLED(DWIN_CREALITY_LCD_ENHANCED)
+    uint8_t dwin_data[eeprom_data_size];
+  #elif ENABLED(DWIN_CREALITY_LCD_JYERSUI)
+    uint8_t dwin_settings[CrealityDWIN.eeprom_data_size];
   #endif
 
   //
@@ -995,15 +1016,17 @@ void MarlinSettings::postprocess() {
     //
     {
       _FIELD_TEST(lcd_contrast);
-
-      const int16_t lcd_contrast =
-        #if HAS_LCD_CONTRAST
-          ui.contrast
-        #else
-          127
-        #endif
-      ;
+      const int16_t lcd_contrast = TERN(HAS_LCD_CONTRAST, ui.contrast, 127);
       EEPROM_WRITE(lcd_contrast);
+    }
+
+    //
+    // LCD Brightness
+    //
+    {
+      _FIELD_TEST(lcd_brightness);
+      const uint8_t lcd_brightness = TERN(HAS_LCD_BRIGHTNESS, ui.brightness, 255);
+      EEPROM_WRITE(lcd_brightness);
     }
 
     //
@@ -1327,12 +1350,31 @@ void MarlinSettings::postprocess() {
     // Extensible UI User Data
     //
     #if ENABLED(EXTENSIBLE_UI)
-      {
-        char extui_data[ExtUI::eeprom_data_size] = { 0 };
-        ExtUI::onStoreSettings(extui_data);
-        _FIELD_TEST(extui_data);
-        EEPROM_WRITE(extui_data);
-      }
+    {
+      char extui_data[ExtUI::eeprom_data_size] = { 0 };
+      ExtUI::onStoreSettings(extui_data);
+      _FIELD_TEST(extui_data);
+      EEPROM_WRITE(extui_data);
+    }
+    #endif
+
+    //
+    // Creality DWIN User Data
+    //
+    #if ENABLED(DWIN_CREALITY_LCD_ENHANCED)
+    {
+      char dwin_data[eeprom_data_size] = { 0 };
+      DWIN_StoreSettings(dwin_data);
+      _FIELD_TEST(dwin_data);
+      EEPROM_WRITE(dwin_data);
+    }
+    #elif ENABLED(DWIN_CREALITY_LCD_JYERSUI)
+    {
+      char dwin_settings[CrealityDWIN.eeprom_data_size] = { 0 };
+      CrealityDWIN.Save_Settings(dwin_settings);
+      _FIELD_TEST(dwin_settings);
+      EEPROM_WRITE(dwin_settings);
+    }
     #endif
 
     //
@@ -1454,6 +1496,8 @@ void MarlinSettings::postprocess() {
         stored_ver[1] = '\0';
       }
       DEBUG_ECHO_MSG("EEPROM version mismatch (EEPROM=", stored_ver, " Marlin=" EEPROM_VERSION ")");
+      TERN_(DWIN_CREALITY_LCD_ENHANCED, ui.set_status(GET_TEXT(MSG_ERR_EEPROM_VERSION)));
+
       IF_DISABLED(EEPROM_AUTO_INIT, ui.eeprom_alert_version());
       eeprom_error = true;
     }
@@ -1843,6 +1887,16 @@ void MarlinSettings::postprocess() {
       }
 
       //
+      // LCD Brightness
+      //
+      {
+        _FIELD_TEST(lcd_brightness);
+        uint8_t lcd_brightness;
+        EEPROM_READ(lcd_brightness);
+        TERN_(HAS_LCD_BRIGHTNESS, if (!validating) ui.set_brightness(lcd_brightness));
+      }
+
+      //
       // Controller Fan
       //
       {
@@ -2196,13 +2250,31 @@ void MarlinSettings::postprocess() {
       // Extensible UI User Data
       //
       #if ENABLED(EXTENSIBLE_UI)
-        // This is a significant hardware change; don't reserve EEPROM space when not present
-        {
-          const char extui_data[ExtUI::eeprom_data_size] = { 0 };
-          _FIELD_TEST(extui_data);
-          EEPROM_READ(extui_data);
-          if (!validating) ExtUI::onLoadSettings(extui_data);
-        }
+      { // This is a significant hardware change; don't reserve EEPROM space when not present
+        const char extui_data[ExtUI::eeprom_data_size] = { 0 };
+        _FIELD_TEST(extui_data);
+        EEPROM_READ(extui_data);
+        if (!validating) ExtUI::onLoadSettings(extui_data);
+      }
+      #endif
+
+      //
+      // Creality DWIN User Data
+      //
+      #if ENABLED(DWIN_CREALITY_LCD_ENHANCED)
+      {
+        const char dwin_data[eeprom_data_size] = { 0 };
+        _FIELD_TEST(dwin_data);
+        EEPROM_READ(dwin_data);
+        if (!validating) DWIN_LoadSettings(dwin_data);
+      }
+      #elif ENABLED(DWIN_CREALITY_LCD_JYERSUI)
+      {
+        const char dwin_settings[CrealityDWIN.eeprom_data_size] = { 0 };
+        _FIELD_TEST(dwin_settings);
+        EEPROM_READ(dwin_settings);
+        if (!validating) CrealityDWIN.Load_Settings(dwin_settings);
+      }
       #endif
 
       //
@@ -2285,6 +2357,7 @@ void MarlinSettings::postprocess() {
       else if (working_crc != stored_crc) {
         eeprom_error = true;
         DEBUG_ERROR_MSG("EEPROM CRC mismatch - (stored) ", stored_crc, " != ", working_crc, " (calculated)!");
+        TERN_(DWIN_CREALITY_LCD_ENHANCED, ui.set_status(GET_TEXT(MSG_ERR_EEPROM_CRC)));
         IF_DISABLED(EEPROM_AUTO_INIT, ui.eeprom_alert_crc());
       }
       else if (!validating) {
@@ -2300,7 +2373,6 @@ void MarlinSettings::postprocess() {
           ubl.report_state();
 
           if (!ubl.sanity_check()) {
-            SERIAL_EOL();
             #if BOTH(EEPROM_CHITCHAT, DEBUG_LEVELING_FEATURE)
               ubl.echo_name();
               DEBUG_ECHOLNPGM(" initialized.\n");
@@ -2378,13 +2450,15 @@ void MarlinSettings::postprocess() {
       UNUSED(s);
     }
 
-    const uint16_t MarlinSettings::meshes_end = persistentStore.capacity() - 129; // 128 (+1 because of the change to capacity rather than last valid address)
-                                                                                  // is a placeholder for the size of the MAT; the MAT will always
-                                                                                  // live at the very end of the eeprom
+    // 128 (+1 because of the change to capacity rather than last valid address)
+    // is a placeholder for the size of the MAT; the MAT will always
+    // live at the very end of the eeprom
+    const uint16_t MarlinSettings::meshes_end = persistentStore.capacity() - 129;
 
     uint16_t MarlinSettings::meshes_start_index() {
-      return (datasize() + EEPROM_OFFSET + 32) & 0xFFF8;  // Pad the end of configuration data so it can float up
-                                                          // or down a little bit without disrupting the mesh data
+      // Pad the end of configuration data so it can float up
+      // or down a little bit without disrupting the mesh data
+      return (datasize() + EEPROM_OFFSET + 32) & 0xFFF8;
     }
 
     #define MESH_STORE_SIZE sizeof(TERN(OPTIMIZED_MESH_STORAGE, mesh_store_t, ubl.z_values))
@@ -2536,9 +2610,7 @@ void MarlinSettings::reset() {
     TERN_(HAS_CLASSIC_E_JERK, planner.max_jerk.e = DEFAULT_EJERK);
   #endif
 
-  #if HAS_JUNCTION_DEVIATION
-    planner.junction_deviation_mm = float(JUNCTION_DEVIATION_MM);
-  #endif
+  TERN_(HAS_JUNCTION_DEVIATION, planner.junction_deviation_mm = float(JUNCTION_DEVIATION_MM));
 
   #if HAS_SCARA_OFFSET
     scara_home_offset.reset();
@@ -2602,6 +2674,8 @@ void MarlinSettings::reset() {
   #endif
 
   TERN_(EXTENSIBLE_UI, ExtUI::onFactoryReset());
+  TERN_(DWIN_CREALITY_LCD_ENHANCED, DWIN_SetDataDefaults());
+  TERN_(DWIN_CREALITY_LCD_JYERSUI, CrealityDWIN.Reset_Settings());
 
   //
   // Case Light Brightness
@@ -2825,6 +2899,11 @@ void MarlinSettings::reset() {
   // LCD Contrast
   //
   TERN_(HAS_LCD_CONTRAST, ui.set_contrast(DEFAULT_LCD_CONTRAST));
+
+  //
+  // LCD Brightness
+  //
+  TERN_(HAS_LCD_BRIGHTNESS, ui.set_brightness(DEFAULT_LCD_BRIGHTNESS));
 
   //
   // Controller Fan
@@ -3127,9 +3206,7 @@ void MarlinSettings::reset() {
 
     CONFIG_ECHO_HEADING(
       "Advanced: B<min_segment_time_us> S<min_feedrate> T<min_travel_feedrate>"
-      #if HAS_JUNCTION_DEVIATION
-        " J<junc_dev>"
-      #endif
+      TERN_(HAS_JUNCTION_DEVIATION, " J<junc_dev>")
       #if HAS_CLASSIC_JERK
         " X<max_x_jerk> Y<max_y_jerk> Z<max_z_jerk>"
         TERN_(HAS_CLASSIC_E_JERK, " E<max_e_jerk>")
@@ -3241,7 +3318,6 @@ void MarlinSettings::reset() {
         if (!forReplay) {
           SERIAL_EOL();
           ubl.report_state();
-          SERIAL_EOL();
           config_heading(false, PSTR("Active Mesh Slot: "), false);
           SERIAL_ECHOLN(ubl.storage_slot);
           config_heading(false, PSTR("EEPROM can hold "), false);
@@ -3302,14 +3378,6 @@ void MarlinSettings::reset() {
 
     #elif ENABLED(DELTA)
 
-      CONFIG_ECHO_HEADING("Endstop adjustment:");
-      CONFIG_ECHO_START();
-      SERIAL_ECHOLNPAIR_P(
-          PSTR("  M666 X"), LINEAR_UNIT(delta_endstop_adj.a)
-        , SP_Y_STR, LINEAR_UNIT(delta_endstop_adj.b)
-        , SP_Z_STR, LINEAR_UNIT(delta_endstop_adj.c)
-      );
-
       CONFIG_ECHO_HEADING("Delta settings: L<diagonal rod> R<radius> H<height> S<segments per sec> XYZ<tower angle trim> ABC<rod trim>");
       CONFIG_ECHO_START();
       SERIAL_ECHOLNPAIR_P(
@@ -3325,32 +3393,11 @@ void MarlinSettings::reset() {
         , PSTR(" C"), LINEAR_UNIT(delta_diagonal_rod_trim.c)
       );
 
-    #elif HAS_EXTRA_ENDSTOPS
+    #endif
 
-      CONFIG_ECHO_HEADING("Endstop adjustment:");
-      CONFIG_ECHO_START();
-      SERIAL_ECHOPGM("  M666");
-      #if ENABLED(X_DUAL_ENDSTOPS)
-        SERIAL_ECHOLNPAIR_P(SP_X_STR, LINEAR_UNIT(endstops.x2_endstop_adj));
-      #endif
-      #if ENABLED(Y_DUAL_ENDSTOPS)
-        SERIAL_ECHOLNPAIR_P(SP_Y_STR, LINEAR_UNIT(endstops.y2_endstop_adj));
-      #endif
-      #if ENABLED(Z_MULTI_ENDSTOPS)
-        #if NUM_Z_STEPPER_DRIVERS >= 3
-          SERIAL_ECHOPAIR(" S2 Z", LINEAR_UNIT(endstops.z3_endstop_adj));
-          CONFIG_ECHO_START();
-          SERIAL_ECHOPAIR("  M666 S3 Z", LINEAR_UNIT(endstops.z3_endstop_adj));
-          #if NUM_Z_STEPPER_DRIVERS >= 4
-            CONFIG_ECHO_START();
-            SERIAL_ECHOPAIR("  M666 S4 Z", LINEAR_UNIT(endstops.z4_endstop_adj));
-          #endif
-        #else
-          SERIAL_ECHOLNPAIR_P(SP_Z_STR, LINEAR_UNIT(endstops.z2_endstop_adj));
-        #endif
-      #endif
-
-    #endif // [XYZ]_DUAL_ENDSTOPS
+    #if EITHER(DELTA, HAS_EXTRA_ENDSTOPS)
+      M666_report(forReplay);
+    #endif
 
     #if PREHEAT_COUNT
 
@@ -3430,6 +3477,11 @@ void MarlinSettings::reset() {
     #if HAS_LCD_CONTRAST
       CONFIG_ECHO_HEADING("LCD Contrast:");
       CONFIG_ECHO_MSG("  M250 C", ui.contrast);
+    #endif
+
+    #if HAS_LCD_BRIGHTNESS
+      CONFIG_ECHO_HEADING("LCD Brightness:");
+      CONFIG_ECHO_MSG("  M256 B", ui.brightness);
     #endif
 
     TERN_(CONTROLLER_FAN_EDITABLE, M710_report(forReplay));
@@ -3818,10 +3870,10 @@ void MarlinSettings::reset() {
         SERIAL_CHAR(' ', 'B');                                 // B (maps to E1 by default)
         SERIAL_ECHOLN(stepper.motor_current_setting[4]);
       #endif
-    #elif ENABLED(HAS_MOTOR_CURRENT_I2C)                       // i2c-based has any number of values
+    #elif HAS_MOTOR_CURRENT_I2C                                // i2c-based has any number of values
       // Values sent over i2c are not stored.
       // Indexes map directly to drivers, not axes.
-    #elif ENABLED(HAS_MOTOR_CURRENT_DAC)                       // DAC-based has 4 values, for X Y Z (I J K) E
+    #elif HAS_MOTOR_CURRENT_DAC                                // DAC-based has 4 values, for X Y Z (I J K) E
       // Values sent over i2c are not stored. Uses indirect mapping.
     #endif
 
@@ -3885,7 +3937,7 @@ void MarlinSettings::reset() {
 
     #if HAS_MULTI_LANGUAGE
       CONFIG_ECHO_HEADING("UI Language:");
-      SERIAL_ECHO_MSG("  M414 S", ui.language);
+      CONFIG_ECHO_MSG("  M414 S", ui.language);
     #endif
   }
 
