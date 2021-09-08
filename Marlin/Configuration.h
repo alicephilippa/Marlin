@@ -153,18 +153,8 @@
 #define LIN_ADVANCE                 //(L) with K=0 For TMC_UART prefer mode spreadCycle(by TFT menu) or commented if problem (Default)
 #define ARC_SUPPORT                 //(R) (Default)
 //#define POWER_LOSS_RECOVERY         // Continue print after Power-Loss.(Defaul_QQS)
-//#define EXTRUDER_STEPS 422          //TITAN
-//#define Z_OFFSET -18      
-#define ESP_WIFI  
-#if ENABLED(ESP_WIFI)
-    #define NUM_SERIAL 2            //MKS WIFI
-#endif
-
-#define LIN_ADVANCE                 //(L) with K=0 For TMC_UART prefer mode spreadCycle(by TFT menu) or commented if problem (Default)
-#define ARC_SUPPORT                 //(R) (Default)
-//#define POWER_LOSS_RECOVERY         // Continue print after Power-Loss.(Defaul_QQS)
-//#define EXTRUDER_STEPS 422          //TITAN
-//#define Z_OFFSET -18      
+#define EXTRUDER_STEPS 138.7        // Creality CR10 type
+#define Z_OFFSET -19.91      
 #define ESP_WIFI  
 #if ENABLED(ESP_WIFI)
     #define NUM_SERIAL 2            //MKS WIFI
