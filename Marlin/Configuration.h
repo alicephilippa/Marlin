@@ -150,8 +150,7 @@
 #define LIN_ADVANCE                 // (L) with K=0 For TMC_UART prefer mode spreadCycle(by TFT menu) or commented if problem (Default)
 #define ARC_SUPPORT                 // (R) (Default)
 //#define POWER_LOSS_RECOVERY       // Continue print after Power-Loss.(Defaul_QQS)
-#define EXTRUDER_STEPS 138.1        // Creality MK8
-#define Z_OFFSET -20.06      
+#define Z_OFFSET -19.00      
 #define ESP_WIFI  
 #if ENABLED(ESP_WIFI)
     #define NUM_SERIAL 2            // MKS WIFI
@@ -939,9 +938,15 @@
 #define X_DRIVER_TYPE  TMC2208_STANDALONE
 #define Y_DRIVER_TYPE  TMC2208_STANDALONE
 #define Z_DRIVER_TYPE  TMC2208_STANDALONE
+//#define I_DRIVER_TYPE A4988
+//#define J_DRIVER_TYPE A4988
+//#define K_DRIVER_TYPE A4988
 //#define X2_DRIVER_TYPE A4988
 //#define Y2_DRIVER_TYPE A4988
 //#define Z2_DRIVER_TYPE A4988
+//#define I2_DRIVER_TYPE A4988
+//#define J2_DRIVER_TYPE A4988
+//#define K2_DRIVER_TYPE A4988
 //#define Z3_DRIVER_TYPE A4988
 //#define Z4_DRIVER_TYPE A4988
 #define E0_DRIVER_TYPE TMC2209_STANDALONE
@@ -1004,7 +1009,8 @@
 #define XYZ_MICROSTEPS              16
 #define XYZ_BELT_PITCH               2
 #define XYZ_PULLEY_TEETH            16
-#define EXTRUDER_STEPS             411.7          //TITAN
+#define EXTRUDER_STEPS             411.7        // Titan
+//#define EXTRUDER_STEPS             138.1        // Creality MK8
 
 // delta speeds must be the same on xyz
 #define DEFAULT_XYZ_STEPS_PER_UNIT ((XYZ_FULL_STEPS_PER_ROTATION) * (XYZ_MICROSTEPS) / double(XYZ_BELT_PITCH) / double(XYZ_PULLEY_TEETH))
@@ -1413,7 +1419,7 @@
 // @section extruder
 
 // For direct drive extruder v9 set to true, for geared extruder set to false.
-#define INVERT_E0_DIR true
+#define INVERT_E0_DIR false
 #define INVERT_E1_DIR false
 #define INVERT_E2_DIR false
 #define INVERT_E3_DIR false
@@ -1618,8 +1624,8 @@
  */
 //#define AUTO_BED_LEVELING_3POINT
 //#define AUTO_BED_LEVELING_LINEAR
-//#define AUTO_BED_LEVELING_BILINEAR
-#define AUTO_BED_LEVELING_UBL
+#define AUTO_BED_LEVELING_BILINEAR
+//#define AUTO_BED_LEVELING_UBL
 //#define MESH_BED_LEVELING
 
 /**
