@@ -1122,7 +1122,7 @@
  * vibration and surface artifacts. The algorithm adapts to provide the best possible step smoothing at the
  * lowest stepping frequencies.
  */
-#define ADAPTIVE_STEP_SMOOTHING
+//#define ADAPTIVE_STEP_SMOOTHING
 
 /**
  * Custom Microstepping
@@ -1588,6 +1588,9 @@
  * printing performance versus fast display updates.
  */
 #if HAS_MARLINUI_U8GLIB
+  // Show SD percentage next to the progress bar
+  #define SHOW_SD_PERCENT
+
   // Save many cycles by drawing a hollow frame or no frame on the Info Screen
   //#define XYZ_NO_FRAME
   #define XYZ_HOLLOW_FRAME
@@ -1640,7 +1643,7 @@
   #define STATUS_ALT_FAN_BITMAP     // Use the alternative fan bitmap
   #define STATUS_FAN_FRAMES 4       // :[0,1,2,3,4] Number of fan animation frames
   #define STATUS_HEAT_PERCENT       // Show heating in a progress bar
-  #define BOOT_MARLIN_LOGO_ANIMATED // Animated Marlin logo. Costs ~‭3260 (or ~940) bytes of PROGMEM.
+  //#define BOOT_MARLIN_LOGO_ANIMATED // Animated Marlin logo. Costs ~‭3260 (or ~940) bytes of PROGMEM.
 
   // Frivolous Game Options
   //#define MARLIN_BRICKOUT
@@ -2172,7 +2175,7 @@
 
 // The ASCII buffer for serial input
 #define MAX_CMD_SIZE 96
-#define BUFSIZE 4
+#define BUFSIZE 16
 
 // Transmission to Host Buffer Size
 // To save 386 bytes of PROGMEM (and TX_BUFFER_SIZE+3 bytes of RAM) set to 0.
@@ -2386,15 +2389,14 @@
 #endif // HAS_MULTI_EXTRUDER
 
 /**
- * Advanced Pause for Filament Change
- *  - Adds the G-code M600 Filament Change to initiate a filament change.
- *  - This feature is required for the default FILAMENT_RUNOUT_SCRIPT.
+ * Advanced Pause
+ * Experimental feature for filament change support and for parking the nozzle when paused.
+ * Adds the GCode M600 for initiating filament change.
+ * If PARK_HEAD_ON_PAUSE enabled, adds the GCode M125 to pause printing and park the nozzle.
  *
- * Requirements:
- *  - For Filament Change parking enable and configure NOZZLE_PARK_FEATURE.
- *  - For user interaction enable an LCD display, HOST_PROMPT_SUPPORT, or EMERGENCY_PARSER.
- *
- * Enable PARK_HEAD_ON_PAUSE to add the G-code M125 Pause and Park.
+ * Requires an LCD display.
+ * Requires NOZZLE_PARK_FEATURE.
+ * This feature is required for the default FILAMENT_RUNOUT_SCRIPT.
  */
 #define ADVANCED_PAUSE_FEATURE
 #if ENABLED(ADVANCED_PAUSE_FEATURE)
@@ -2403,7 +2405,7 @@
                                                   // This short retract is done immediately, before parking the nozzle.
   #define FILAMENT_CHANGE_UNLOAD_FEEDRATE     28  // (mm/s) Unload filament feedrate. This can be pretty fast.
   #define FILAMENT_CHANGE_UNLOAD_ACCEL        25  // (mm/s^2) Lower acceleration may allow a faster feedrate.
-  #define FILAMENT_CHANGE_UNLOAD_LENGTH      550  // (mm) The length of filament for a complete unload.
+  #define FILAMENT_CHANGE_UNLOAD_LENGTH      730  // (mm) The length of filament for a complete unload.
                                                   //   For Bowden, the full length of the tube and nozzle.
                                                   //   For direct drive, the full length of the nozzle.
                                                   //   Set to 0 for manual unloading.
@@ -2411,8 +2413,8 @@
   #define FILAMENT_CHANGE_SLOW_LOAD_LENGTH     0  // (mm) Slow length, to allow time to insert material.
                                                   // 0 to disable start loading and skip to fast load only
   #define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE  20  // (mm/s) Load filament feedrate. This can be pretty fast.
-  #define FILAMENT_CHANGE_FAST_LOAD_ACCEL     25  // (mm/s^2) Lower acceleration may allow a faster feedrate.
-  #define FILAMENT_CHANGE_FAST_LOAD_LENGTH   550  // (mm) Load length of filament, from extruder gear to nozzle.
+  #define FILAMENT_CHANGE_FAST_LOAD_ACCEL     30  // (mm/s^2) Lower acceleration may allow a faster feedrate.
+  #define FILAMENT_CHANGE_FAST_LOAD_LENGTH   730  // (mm) Load length of filament, from extruder gear to nozzle.
                                                   //   For Bowden, the full length of the tube and nozzle.
                                                   //   For direct drive, the full length of the nozzle.
   //#define ADVANCED_PAUSE_CONTINUOUS_PURGE       // Purge continuously up to the purge length until interrupted.
@@ -2860,22 +2862,22 @@
    * { <off_time[1..15]>, <hysteresis_end[-3..12]>, hysteresis_start[1..8] }
    */
   #define CHOPPER_TIMING CHOPPER_DEFAULT_24V        // All axes (override below)
-  //#define CHOPPER_TIMING_X  CHOPPER_TIMING   // For X Axes (override below)
-  //#define CHOPPER_TIMING_X2 CHOPPER_TIMING
-  //#define CHOPPER_TIMING_Y  CHOPPER_TIMING   // For Y Axes (override below)
-  //#define CHOPPER_TIMING_Y2 CHOPPER_TIMING
-  //#define CHOPPER_TIMING_Z  CHOPPER_TIMING   // For Z Axes (override below)
-  //#define CHOPPER_TIMING_Z2 CHOPPER_TIMING
-  //#define CHOPPER_TIMING_Z3 CHOPPER_TIMING
-  //#define CHOPPER_TIMING_Z4 CHOPPER_TIMING
-  //#define CHOPPER_TIMING_E  CHOPPER_TIMING   // For Extruders (override below)
-  //#define CHOPPER_TIMING_E1 CHOPPER_TIMING
-  //#define CHOPPER_TIMING_E2 CHOPPER_TIMING
-  //#define CHOPPER_TIMING_E3 CHOPPER_TIMING
-  //#define CHOPPER_TIMING_E4 CHOPPER_TIMING
-  //#define CHOPPER_TIMING_E5 CHOPPER_TIMING
-  //#define CHOPPER_TIMING_E6 CHOPPER_TIMING
-  //#define CHOPPER_TIMING_E7 CHOPPER_TIMING
+  //#define CHOPPER_TIMING_X  CHOPPER_TIMING        // For X Axes (override below)
+  //#define CHOPPER_TIMING_X2 CHOPPER_TIMING_X
+  //#define CHOPPER_TIMING_Y  CHOPPER_TIMING        // For Y Axes (override below)
+  //#define CHOPPER_TIMING_Y2 CHOPPER_TIMING_Y
+  //#define CHOPPER_TIMING_Z  CHOPPER_TIMING        // For Z Axes (override below)
+  //#define CHOPPER_TIMING_Z2 CHOPPER_TIMING_Z
+  //#define CHOPPER_TIMING_Z3 CHOPPER_TIMING_Z
+  //#define CHOPPER_TIMING_Z4 CHOPPER_TIMING_Z
+  //#define CHOPPER_TIMING_E  CHOPPER_TIMING        // For Extruders (override below)
+  //#define CHOPPER_TIMING_E1 CHOPPER_TIMING_E
+  //#define CHOPPER_TIMING_E2 CHOPPER_TIMING_E
+  //#define CHOPPER_TIMING_E3 CHOPPER_TIMING_E
+  //#define CHOPPER_TIMING_E4 CHOPPER_TIMING_E
+  //#define CHOPPER_TIMING_E5 CHOPPER_TIMING_E
+  //#define CHOPPER_TIMING_E6 CHOPPER_TIMING_E
+  //#define CHOPPER_TIMING_E7 CHOPPER_TIMING_E
 
   /**
    * Monitor Trinamic drivers
@@ -2905,17 +2907,17 @@
    */
   #define HYBRID_THRESHOLD
 
-  #define X_HYBRID_THRESHOLD     100  // [mm/s]
-  #define X2_HYBRID_THRESHOLD    100
-  #define Y_HYBRID_THRESHOLD     100
-  #define Y2_HYBRID_THRESHOLD    100
-  #define Z_HYBRID_THRESHOLD     100
-  #define Z2_HYBRID_THRESHOLD    100
-  #define Z3_HYBRID_THRESHOLD    100
-  #define Z4_HYBRID_THRESHOLD    100
   #define I_HYBRID_THRESHOLD     100
-  #define J_HYBRID_THRESHOLD     100
-  #define K_HYBRID_THRESHOLD     100
+  #define X_HYBRID_THRESHOLD     150  // [mm/s]
+  #define X2_HYBRID_THRESHOLD    150
+  #define Y_HYBRID_THRESHOLD     150
+  #define Y2_HYBRID_THRESHOLD    150
+  #define Z_HYBRID_THRESHOLD     150
+  #define Z2_HYBRID_THRESHOLD    150
+  #define Z3_HYBRID_THRESHOLD    150
+  #define Z4_HYBRID_THRESHOLD    150
+  #define J_HYBRID_THRESHOLD       3
+  #define K_HYBRID_THRESHOLD       3
   #define E0_HYBRID_THRESHOLD     30
   #define E1_HYBRID_THRESHOLD     30
   #define E2_HYBRID_THRESHOLD     30
@@ -2991,7 +2993,7 @@
    * Enable M122 debugging command for TMC stepper drivers.
    * M122 S0/1 will enable continuous reporting.
    */
-  //#define TMC_DEBUG
+  #define TMC_DEBUG
 
   /**
    * You can set your own advanced settings by filling in predefined functions.
@@ -3600,11 +3602,6 @@
 #define AUTO_REPORT_TEMPERATURES
 
 /**
- * Auto-report position with M154 S<seconds>
- */
-//#define AUTO_REPORT_POSITION
-
-/**
  * Include capabilities in M115 output
  */
 #define EXTENDED_CAPABILITIES_REPORT
@@ -3673,7 +3670,7 @@
 #define PROPORTIONAL_FONT_RATIO 1.0
 
 /**
- * Spend 28 bytes of SRAM to optimize the G-code parser
+ * Spend 28 bytes of SRAM to optimize the GCode parser
  */
 #define FASTER_GCODE_PARSER
 
