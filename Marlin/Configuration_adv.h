@@ -584,7 +584,7 @@
  * Multiple extruders can be assigned to the same pin in which case
  * the fan will turn on when any selected extruder is above the threshold.
  */
-#define E0_AUTO_FAN_PIN PB0
+#define E0_AUTO_FAN_PIN -1
 #define E1_AUTO_FAN_PIN -1
 #define E2_AUTO_FAN_PIN -1
 #define E3_AUTO_FAN_PIN -1
@@ -989,6 +989,7 @@
 
 // If the Nozzle or Bed falls when the Z stepper is disabled, set its resting position here.
 //#define Z_AFTER_DEACTIVATE Z_HOME_POS
+
 // Default Minimum Feedrates for printing and travel moves
 #define DEFAULT_MINIMUMFEEDRATE       0.0     // (mm/s) Minimum feedrate. Set with M205 S.
 #define DEFAULT_MINTRAVELFEEDRATE     0.0     // (mm/s) Minimum travel feedrate. Set with M205 T.
@@ -1161,7 +1162,7 @@
  *    M909, M910 & LCD - only PRINTRBOARD_REVF & RIGIDBOARD_V2
  */
 //#define PWM_MOTOR_CURRENT { 1300, 1300, 1250 }          // Values in milliamps
-#define DIGIPOT_MOTOR_CURRENT { 135,135,135,135,135 }   // Values 0-255 (RAMBO 135 = ~0.75A, 185 = ~1A)
+//#define DIGIPOT_MOTOR_CURRENT { 135,135,135,135,135 }   // Values 0-255 (RAMBO 135 = ~0.75A, 185 = ~1A)
 //#define DAC_MOTOR_CURRENT_DEFAULT { 70, 80, 90, 80 }    // Default drive percent - X, Y, Z, E axis
 
 /**
@@ -1292,9 +1293,9 @@
       #define STATUS_HEAT_PERCENT
       #define STATUS_ALT_FAN_BITMAP
       #define STATUS_ALT_BED_BITMAP
-      #define BOOT_MARLIN_LOGO_ANIMATED
+      //#define BOOT_MARLIN_LOGO_ANIMATED
       //#define MARLIN_LOGO_FULL_SIZE MarlinLogo320x240x16
-      //#define BOOT_MARLIN_LOGO_SMALL     // Show a smaller Marlin logo on the Boot Screen (saving lots of flash)
+      #define BOOT_MARLIN_LOGO_SMALL     // Show a smaller Marlin logo on the Boot Screen (saving lots of flash)
     #endif
   #endif
 
@@ -2163,18 +2164,18 @@
 // The number of linear moves that can be in the planner at once.
 // The value of BLOCK_BUFFER_SIZE must be a power of 2 (e.g., 8, 16, 32)
 #if BOTH(SDSUPPORT, DIRECT_STEPPING)
-  #define BLOCK_BUFFER_SIZE  8
+  #define BLOCK_BUFFER_SIZE 32
 #elif ENABLED(SDSUPPORT)
-  #define BLOCK_BUFFER_SIZE 16
+  #define BLOCK_BUFFER_SIZE 64
 #else
-  #define BLOCK_BUFFER_SIZE 16
+  #define BLOCK_BUFFER_SIZE 64
 #endif
 
 // @section serial
 
 // The ASCII buffer for serial input
 #define MAX_CMD_SIZE 96
-#define BUFSIZE 4
+#define BUFSIZE 32
 
 // Transmission to Host Buffer Size
 // To save 386 bytes of PROGMEM (and TX_BUFFER_SIZE+3 bytes of RAM) set to 0.
@@ -2196,6 +2197,9 @@
   // the host to signal the RX buffer is becoming full.
   //#define SERIAL_XON_XOFF
 #endif
+
+// Add M575 G-code to change the baud rate
+//#define BAUD_RATE_GCODE
 
 #if ENABLED(SDSUPPORT)
   // Enable this option to collect and display the maximum

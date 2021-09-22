@@ -2881,10 +2881,11 @@
 
   #define TOUCH_SCREEN_CALIBRATION
 
-  #define XPT2046_X_CALIBRATION -11834
-  #define XPT2046_Y_CALIBRATION   8501
-  #define XPT2046_X_OFFSET         355
-  #define XPT2046_Y_OFFSET         -11
+  //#define TOUCH_CALIBRATION_X 12316
+  //#define TOUCH_CALIBRATION_Y -8981
+  //#define TOUCH_OFFSET_X        -43
+  //#define TOUCH_OFFSET_Y        257
+  //#define TOUCH_ORIENTATION TOUCH_LANDSCAPE
 
   #if BOTH(TOUCH_SCREEN_CALIBRATION, EEPROM_SETTINGS)
     #define TOUCH_CALIBRATION_AUTO_SAVE // Auto save successful calibration values to EEPROM
