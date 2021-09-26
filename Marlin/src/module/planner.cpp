@@ -1310,7 +1310,7 @@ void Planner::recalculate() {
  */
 void Planner::check_axes_activity() {
 
-  #if ANY(DISABLE_X, DISABLE_Y, DISABLE_Z , DISABLE_I , DISABLE_J , DISABLE_K, DISABLE_E)
+  #if ANY(DISABLE_X, DISABLE_Y, DISABLE_Z, DISABLE_I, DISABLE_J, DISABLE_K, DISABLE_E)
     xyze_bool_t axis_active = { false };
   #endif
 
@@ -1858,7 +1858,7 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
   );
 
   /* <-- add a slash to enable
-    SERIAL_ECHOLNPAIR(
+    SERIAL_ECHOLNPGM(
       "  _populate_block FR:", fr_mm_s,
       " A:", target.a, " (", da, " steps)"
       " B:", target.b, " (", db, " steps)"
@@ -1913,7 +1913,7 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
   #endif // PREVENT_COLD_EXTRUSION || PREVENT_LENGTHY_EXTRUDE
 
   // Compute direction bit-mask for this block
-  uint8_t dm = 0;
+  axis_bits_t dm = 0;
   #if CORE_IS_XY
     if (da < 0) SBI(dm, X_HEAD);                // Save the toolhead's true direction in X
     if (db < 0) SBI(dm, Y_HEAD);                // ...and Y
@@ -2331,10 +2331,10 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
           if (max_vfr > 0 && cs > max_vfr) {
             NOMORE(speed_factor, max_vfr / cs); // respect volumetric extruder limit (if any)
             /* <-- add a slash to enable
-            SERIAL_ECHOPAIR("volumetric extruder limit enforced: ", (cs * CIRCLE_AREA(filament_size[extruder] * 0.5f)));
-            SERIAL_ECHOPAIR(" mm^3/s (", cs);
-            SERIAL_ECHOPAIR(" mm/s) limited to ", (max_vfr * CIRCLE_AREA(filament_size[extruder] * 0.5f)));
-            SERIAL_ECHOPAIR(" mm^3/s (", max_vfr);
+            SERIAL_ECHOPGM("volumetric extruder limit enforced: ", (cs * CIRCLE_AREA(filament_size[extruder] * 0.5f)));
+            SERIAL_ECHOPGM(" mm^3/s (", cs);
+            SERIAL_ECHOPGM(" mm/s) limited to ", (max_vfr * CIRCLE_AREA(filament_size[extruder] * 0.5f)));
+            SERIAL_ECHOPGM(" mm^3/s (", max_vfr);
             SERIAL_ECHOLNPGM(" mm/s)");
             //*/
           }
@@ -2345,11 +2345,11 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
 
   #ifdef XY_FREQUENCY_LIMIT
 
-    static uint8_t old_direction_bits; // = 0
+    static axis_bits_t old_direction_bits; // = 0
 
     if (xy_freq_limit_hz) {
       // Check and limit the xy direction change frequency
-      const uint8_t direction_change = block->direction_bits ^ old_direction_bits;
+      const axis_bits_t direction_change = block->direction_bits ^ old_direction_bits;
       old_direction_bits = block->direction_bits;
       segment_time_us = LROUND(float(segment_time_us) / speed_factor);
 
@@ -2921,44 +2921,44 @@ bool Planner::buffer_segment(const abce_pos_t &abce
   #endif
 
   /* <-- add a slash to enable
-    SERIAL_ECHOPAIR("  buffer_segment FR:", fr_mm_s);
+    SERIAL_ECHOPGM("  buffer_segment FR:", fr_mm_s);
     #if IS_KINEMATIC
-      SERIAL_ECHOPAIR(" A:", abce.a, " (", position.a, "->", target.a, ") B:", abce.b);
+      SERIAL_ECHOPGM(" A:", abce.a, " (", position.a, "->", target.a, ") B:", abce.b);
     #else
-      SERIAL_ECHOPAIR_P(SP_X_LBL, abce.a);
-      SERIAL_ECHOPAIR(" (", position.x, "->", target.x);
+      SERIAL_ECHOPGM_P(SP_X_LBL, abce.a);
+      SERIAL_ECHOPGM(" (", position.x, "->", target.x);
       SERIAL_CHAR(')');
-      SERIAL_ECHOPAIR_P(SP_Y_LBL, abce.b);
+      SERIAL_ECHOPGM_P(SP_Y_LBL, abce.b);
     #endif
-    SERIAL_ECHOPAIR(" (", position.y, "->", target.y);
+    SERIAL_ECHOPGM(" (", position.y, "->", target.y);
     #if LINEAR_AXES >= ABC
       #if ENABLED(DELTA)
-        SERIAL_ECHOPAIR(") C:", abce.c);
+        SERIAL_ECHOPGM(") C:", abce.c);
       #else
         SERIAL_CHAR(')');
-        SERIAL_ECHOPAIR_P(SP_Z_LBL, abce.c);
+        SERIAL_ECHOPGM_P(SP_Z_LBL, abce.c);
       #endif
-      SERIAL_ECHOPAIR(" (", position.z, "->", target.z);
+      SERIAL_ECHOPGM(" (", position.z, "->", target.z);
       SERIAL_CHAR(')');
     #endif
     #if LINEAR_AXES >= 4
-      SERIAL_ECHOPAIR_P(SP_I_LBL, abce.i);
-      SERIAL_ECHOPAIR(" (", position.i, "->", target.i);
+      SERIAL_ECHOPGM_P(SP_I_LBL, abce.i);
+      SERIAL_ECHOPGM(" (", position.i, "->", target.i);
       SERIAL_CHAR(')');
     #endif
     #if LINEAR_AXES >= 5
-      SERIAL_ECHOPAIR_P(SP_J_LBL, abce.j);
-      SERIAL_ECHOPAIR(" (", position.j, "->", target.j);
+      SERIAL_ECHOPGM_P(SP_J_LBL, abce.j);
+      SERIAL_ECHOPGM(" (", position.j, "->", target.j);
       SERIAL_CHAR(')');
     #endif
     #if LINEAR_AXES >= 6
-      SERIAL_ECHOPAIR_P(SP_K_LBL, abce.k);
-      SERIAL_ECHOPAIR(" (", position.k, "->", target.k);
+      SERIAL_ECHOPGM_P(SP_K_LBL, abce.k);
+      SERIAL_ECHOPGM(" (", position.k, "->", target.k);
       SERIAL_CHAR(')');
     #endif
     #if HAS_EXTRUDERS
-      SERIAL_ECHOPAIR_P(SP_E_LBL, abce.e);
-      SERIAL_ECHOLNPAIR(" (", position.e, "->", target.e, ")");
+      SERIAL_ECHOPGM_P(SP_E_LBL, abce.e);
+      SERIAL_ECHOLNPGM(" (", position.e, "->", target.e, ")");
     #else
       SERIAL_EOL();
     #endif
@@ -3021,7 +3021,7 @@ bool Planner::buffer_line(const xyze_pos_t &cart, const_feedRate_t fr_mm_s, cons
     #else
       const feedRate_t feedrate = fr_mm_s;
     #endif
-    delta.e = machine.e;
+    TERN_(HAS_EXTRUDERS, delta.e = machine.e);
     if (buffer_segment(delta OPTARG(HAS_DIST_MM_ARG, cart_dist_mm), feedrate, extruder, mm)) {
       position_cart = cart;
       return true;
@@ -3126,7 +3126,7 @@ void Planner::set_position_mm(const xyze_pos_t &xyze) {
   #if IS_KINEMATIC
     position_cart = xyze;
     inverse_kinematics(machine);
-    delta.e = machine.e;
+    TERN_(HAS_EXTRUDERS, delta.e = machine.e);
     set_machine_position_mm(delta);
   #else
     set_machine_position_mm(machine);
@@ -3186,7 +3186,7 @@ inline void limit_and_warn(float &val, const uint8_t axis, PGM_P const setting_n
     SERIAL_CHAR(AXIS_CHAR(lim_axis));
     SERIAL_ECHOPGM(" Max ");
     SERIAL_ECHOPGM_P(setting_name);
-    SERIAL_ECHOLNPAIR(" limited to ", val);
+    SERIAL_ECHOLNPGM(" limited to ", val);
   }
 }
 
