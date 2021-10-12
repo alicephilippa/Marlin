@@ -91,6 +91,7 @@
 #define Y_STOP_PIN                          PA12  // -Y
 #define Z_MIN_PIN                           PA11  // -Z
 #define Z_MAX_PIN                           PC4   // +Z
+#define MT_DET_1_PIN                        PA4   // MT_DET
 
 #ifndef FIL_RUNOUT_PIN
   #define FIL_RUNOUT_PIN            MT_DET_1_PIN
