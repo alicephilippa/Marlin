@@ -2028,7 +2028,7 @@
 /**
  * @brief 
  * 
- */
+ *
  * Override if the automatically selected points are inadequate.
  */
 #if EITHER(AUTO_BED_LEVELING_3POINT, AUTO_BED_LEVELING_UBL)
