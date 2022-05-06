@@ -57,7 +57,7 @@
 #if HAS_TMC_SPI
   #define TMC_USE_SW_SPI
 #endif
-#if ENABLED(TMC_USE_SW_SPI)
+#if defined(TMC_USE_SW_SPI)
   #if !defined(TMC_SW_MOSI) || TMC_SW_MOSI == -1
     #define TMC_SW_MOSI                     PD14
   #endif
