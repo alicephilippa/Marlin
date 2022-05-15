@@ -32,7 +32,7 @@
 
 #define BOARD_INFO_NAME "MKS Robin Nano V3"
 
-#define USES_DIAG_JUMPERS
+//#define USES_DIAG_JUMPERS
 
 #ifndef X_CS_PIN
   #define X_CS_PIN                          PD5
