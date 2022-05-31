@@ -15,7 +15,7 @@ if pioutil.is_pio_build():
 	FEATURE_CONFIG = {}
 
 	def validate_pio():
-		PIO_VERSION_MIN = (5, 0, 3)
+		PIO_VERSION_MIN = (6, 0, 1)
 		try:
 			from platformio import VERSION as PIO_VERSION
 			weights = (1000, 100, 1)
