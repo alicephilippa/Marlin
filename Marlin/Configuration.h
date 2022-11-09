@@ -1196,7 +1196,7 @@
 #define XYZ_BELT_PITCH 2
 #define XYZ_PULLEY_TEETH 20
 //#define EXTRUDER_STEPS_PER_UNIT 138.1     //Creality MK8/CR10
-#define EXTRUDER_STEPS_PER_UNIT 415.0     //Creality BMG/Titan
+#define EXTRUDER_STEPS_PER_UNIT 388.1     //BMG/Titan
 
 // delta speeds must be the same on xyz
 #define DEFAULT_XYZ_STEPS_PER_UNIT ((XYZ_FULL_STEPS_PER_ROTATION) * (XYZ_MICROSTEPS) / double(XYZ_BELT_PITCH) / double(XYZ_PULLEY_TEETH))
