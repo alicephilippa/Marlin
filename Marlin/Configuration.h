@@ -1345,7 +1345,7 @@
  *
  * See https://github.com/synthetos/TinyG/wiki/Jerk-Controlled-Motion-Explained
  */
-#define EXPERIMENTAL_SCURVE
+// #define EXPERIMENTAL_SCURVE
 
 //===========================================================================
 //============================= Z Probe Options =============================
@@ -1781,15 +1781,15 @@
 // @section geometry
 
 // The size of the print bed
-#define X_BED_SIZE ((DELTA_PRINTABLE_RADIUS) * 2)
-#define Y_BED_SIZE ((DELTA_PRINTABLE_RADIUS) * 2)
+#define X_BED_SIZE ((PRINTABLE_RADIUS) * 2)
+#define Y_BED_SIZE ((PRINTABLE_RADIUS) * 2)
 
 // Travel limits (mm) after homing, corresponding to endstop positions.
-#define X_MIN_POS -(DELTA_PRINTABLE_RADIUS)
-#define Y_MIN_POS -(DELTA_PRINTABLE_RADIUS)
+#define X_MIN_POS -(PRINTABLE_RADIUS)
+#define Y_MIN_POS -(PRINTABLE_RADIUS)
 #define Z_MIN_POS 0
-#define X_MAX_POS DELTA_PRINTABLE_RADIUS
-#define Y_MAX_POS DELTA_PRINTABLE_RADIUS
+#define X_MAX_POS PRINTABLE_RADIUS
+#define Y_MAX_POS PRINTABLE_RADIUS
 #define Z_MAX_POS DELTA_HEIGHT
 //#define I_MIN_POS 0
 //#define I_MAX_POS 50
