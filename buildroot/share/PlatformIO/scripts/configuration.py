@@ -103,7 +103,7 @@ def fetch_example(url):
     import os
 
     # Reset configurations to default
-    os.system("git reset --hard HEAD")
+    os.system("git checkout HEAD Marlin/*.h")
 
     # Try to fetch the remote files
     gotfile = False
