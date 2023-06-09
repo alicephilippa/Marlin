@@ -73,7 +73,7 @@
  * Define a generic printer name to be output to the LCD after booting Marlin.
  */
 #ifndef MACHINE_NAME
-  #define MACHINE_NAME "Squishy" // "ΔSquishy"
+  #define MACHINE_NAME "Delta_Squishy" // "ΔSquishy"
 #endif
 
 /**
