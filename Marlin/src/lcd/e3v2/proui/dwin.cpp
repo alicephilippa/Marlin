@@ -135,16 +135,14 @@
 
 #define PAUSE_HEAT
 
-// Print speed limit
-#define MIN_PRINT_SPEED  10
-#define MAX_PRINT_SPEED 999
-
-// Print flow limit
-#define MIN_PRINT_FLOW   10
-#define MAX_PRINT_FLOW   299
-
 // Load and Unload limits
-#define MAX_LOAD_UNLOAD  500
+#ifndef EXTRUDE_MAXLENGTH
+  #ifdef FILAMENT_CHANGE_UNLOAD_LENGTH
+    #define EXTRUDE_MAXLENGTH (FILAMENT_CHANGE_UNLOAD_LENGTH + 10)
+  #else
+    #define EXTRUDE_MAXLENGTH 500
+  #endif
+#endif
 
 // Juntion deviation limits
 #define MIN_JD_MM             0.001
@@ -238,7 +236,7 @@ Menu *filamentMenu = nullptr;
 Menu *temperatureMenu = nullptr;
 Menu *maxSpeedMenu = nullptr;
 Menu *maxAccelMenu = nullptr;
-#if HAS_CLASSIC_JERK
+#if ENABLED(CLASSIC_JERK)
   Menu *maxJerkMenu = nullptr;
 #endif
 Menu *stepsMenu = nullptr;
@@ -1251,7 +1249,7 @@ void eachMomentUpdate() {
   static millis_t next_var_update_ms = 0, next_rts_update_ms = 0, next_status_update_ms = 0;
   const millis_t ms = millis();
 
-  #if LCD_BACKLIGHT_TIMEOUT_MINS
+  #if HAS_BACKLIGHT_TIMEOUT
     if (ui.backlight_off_ms && ELAPSED(ms, ui.backlight_off_ms)) {
       turnOffBacklight(); // Backlight off
       ui.backlight_off_ms = 0;
@@ -1724,7 +1722,7 @@ void dwinPrintAborted() {
       );
     }
   #endif
-  hostui.notify("Print Aborted");
+  TERN_(HOST_PROMPT_SUPPORT, hostui.notify(GET_TEXT_F(MSG_PRINT_ABORTED)));
   dwinPrintFinished();
 }
 
@@ -2237,7 +2235,7 @@ void setMoveZ() { hmiValue.axis = Z_AXIS; setPFloatOnClick(Z_MIN_POS, Z_MAX_POS,
 
 #endif
 
-#if LCD_BACKLIGHT_TIMEOUT_MINS
+#if ENABLED(EDITABLE_DISPLAY_TIMEOUT)
   void applyTimer() { ui.backlight_timeout_minutes = menuData.value; }
   void setTimer() { setIntOnClick(ui.backlight_timeout_min, ui.backlight_timeout_max, ui.backlight_timeout_minutes, applyTimer); }
 #endif
@@ -2254,8 +2252,8 @@ void setMoveZ() { hmiValue.axis = Z_AXIS; setPFloatOnClick(Z_MIN_POS, Z_MAX_POS,
 #endif
 
 #if ENABLED(ADVANCED_PAUSE_FEATURE)
-  void setFilLoad()   { setPFloatOnClick(0, MAX_LOAD_UNLOAD, UNITFDIGITS); }
-  void setFilUnload() { setPFloatOnClick(0, MAX_LOAD_UNLOAD, UNITFDIGITS); }
+  void setFilLoad()   { setPFloatOnClick(0, EXTRUDE_MAXLENGTH, UNITFDIGITS); }
+  void setFilUnload() { setPFloatOnClick(0, EXTRUDE_MAXLENGTH, UNITFDIGITS); }
 #endif
 
 #if ENABLED(PREVENT_COLD_EXTRUSION)
@@ -2263,7 +2261,7 @@ void setMoveZ() { hmiValue.axis = Z_AXIS; setPFloatOnClick(Z_MIN_POS, Z_MAX_POS,
   void setExtMinT() { setPIntOnClick(MIN_ETEMP, MAX_ETEMP, applyExtMinT); }
 #endif
 
-void setSpeed() { setPIntOnClick(MIN_PRINT_SPEED, MAX_PRINT_SPEED); }
+void setSpeed() { setPIntOnClick(SPEED_EDIT_MIN, SPEED_EDIT_MAX); }
 
 #if HAS_HOTEND
   void applyHotendTemp() { thermalManager.setTargetHotend(menuData.value, 0); }
@@ -2308,7 +2306,7 @@ void setSpeed() { setPIntOnClick(MIN_PRINT_SPEED, MAX_PRINT_SPEED); }
 
 #endif // ADVANCED_PAUSE_FEATURE
 
-void setFlow() { setPIntOnClick(MIN_PRINT_FLOW, MAX_PRINT_FLOW, []{ planner.refresh_e_factor(0); }); }
+void setFlow() { setPIntOnClick(FLOW_EDIT_MIN, FLOW_EDIT_MAX, []{ planner.refresh_e_factor(0); }); }
 
 // Bed Tramming
 
@@ -2547,7 +2545,7 @@ void applyMaxAccel() { planner.set_max_acceleration(hmiValue.axis, menuData.valu
   void setMaxAccelE() { hmiValue.axis = E_AXIS; setIntOnClick(min_acceleration_edit_values.e, max_acceleration_edit_values.e, planner.settings.max_acceleration_mm_per_s2[E_AXIS], applyMaxAccel); }
 #endif
 
-#if HAS_CLASSIC_JERK
+#if ENABLED(CLASSIC_JERK)
   void applyMaxJerk() { planner.set_max_jerk(hmiValue.axis, menuData.value / MINUNITMULT); }
   #if HAS_X_AXIS
     void setMaxJerkX() { hmiValue.axis = X_AXIS, setFloatOnClick(min_jerk_edit_values.x, max_jerk_edit_values.x, UNITFDIGITS, planner.max_jerk.x, applyMaxJerk); }
@@ -2882,7 +2880,7 @@ void onDrawAcc(MenuItem* menuitem, int8_t line) {
   }
 #endif
 
-#if HAS_CLASSIC_JERK
+#if ENABLED(CLASSIC_JERK)
 
   void onDrawJerk(MenuItem* menuitem, int8_t line) {
     if (hmiIsChinese()) {
@@ -2943,7 +2941,7 @@ void onDrawAcc(MenuItem* menuitem, int8_t line) {
 
   #endif
 
-#endif // HAS_CLASSIC_JERK
+#endif // CLASSIC_JERK
 
 #if HAS_X_AXIS
   void onDrawStepsX(MenuItem* menuitem, int8_t line) {
@@ -3125,7 +3123,7 @@ void drawAdvancedSettingsMenu() {
     #if HAS_LOCKSCREEN
       MENU_ITEM(ICON_Lock, MSG_LOCKSCREEN, onDrawMenuItem, dwinLockScreen);
     #endif
-    #if LCD_BACKLIGHT_TIMEOUT_MINS
+    #if ENABLED(EDITABLE_DISPLAY_TIMEOUT)
       EDIT_ITEM(ICON_Brightness, MSG_SCREEN_TIMEOUT, onDrawPIntMenu, setTimer, &ui.backlight_timeout_minutes);
     #endif
     #if ENABLED(SOUND_MENU_ITEM)
@@ -3349,7 +3347,7 @@ void drawTuneMenu() {
       EDIT_ITEM(ICON_Brightness, MSG_BRIGHTNESS, onDrawPInt8Menu, setBrightness, &ui.brightness);
       MENU_ITEM(ICON_Brightness, MSG_BRIGHTNESS_OFF, onDrawMenuItem, turnOffBacklight);
     #endif
-    #if LCD_BACKLIGHT_TIMEOUT_MINS
+    #if ENABLED(EDITABLE_DISPLAY_TIMEOUT)
       EDIT_ITEM(ICON_Brightness, MSG_SCREEN_TIMEOUT, onDrawPIntMenu, setTimer, &ui.backlight_timeout_minutes);
     #endif
     #if ENABLED(CASE_LIGHT_MENU)
@@ -3453,7 +3451,7 @@ void drawMotionMenu() {
     BACK_ITEM(drawControlMenu);
     MENU_ITEM(ICON_MaxSpeed, MSG_SPEED, onDrawSpeed, drawMaxSpeedMenu);
     MENU_ITEM(ICON_MaxAccelerated, MSG_ACCELERATION, onDrawAcc, drawMaxAccelMenu);
-    #if HAS_CLASSIC_JERK
+    #if ENABLED(CLASSIC_JERK)
       MENU_ITEM(ICON_MaxJerk, MSG_JERK, onDrawJerk, drawMaxJerkMenu);
     #elif HAS_JUNCTION_DEVIATION
       EDIT_ITEM(ICON_JDmm, MSG_JUNCTION_DEVIATION, onDrawPFloat3Menu, setJDmm, &planner.junction_deviation_mm);
@@ -3618,7 +3616,7 @@ void drawMaxAccelMenu() {
   updateMenu(maxAccelMenu);
 }
 
-#if HAS_CLASSIC_JERK
+#if ENABLED(CLASSIC_JERK)
 
   void drawMaxJerkMenu() {
     checkkey = ID_Menu;
@@ -3640,7 +3638,7 @@ void drawMaxAccelMenu() {
     updateMenu(maxJerkMenu);
   }
 
-#endif // HAS_CLASSIC_JERK
+#endif // CLASSIC_JERK
 
 void drawStepsMenu() {
   checkkey = ID_Menu;
