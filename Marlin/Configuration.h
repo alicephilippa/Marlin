@@ -1271,7 +1271,7 @@
 
  
  /* Default Max Feed Rate (mm/s)
-/**
+ *
  * Enable support for M92. Disable to save at least ~530 bytes of flash.
  */
 #define EDITABLE_STEPS_PER_UNIT
@@ -2274,7 +2274,7 @@
  * Commands to execute at the end of G29 probing.
  * Useful to retract or move the Z probe out of the way.
  */
-#define Z_PROBE_END_SCRIPT "G0 Z30 F12000\n G0 X0 Y0 Z100" // * "G28"
+#define EVENT_GCODE_AFTER_G29 "G0 Z30 F12000\n G0 X0 Y0 Z100" // * "G28"
 
 // @section homing
 
