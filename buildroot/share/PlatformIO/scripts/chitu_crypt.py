@@ -4,12 +4,12 @@
 #
 import pioutil
 if pioutil.is_pio_build():
-    import os,random,struct,uuid,marlin
-    # Relocate firmware from 0x08000000 to 0x08008800
-    marlin.relocate_firmware("0x08008800")
+    import struct,uuid,marlin
+
+    board = marlin.env.BoardConfig()
 
     def calculate_crc(contents, seed):
-        accumulating_xor_value = seed;
+        accumulating_xor_value = seed
 
         for i in range(0, len(contents), 4):
             value = struct.unpack('<I', contents[ i : i + 4])[0]
@@ -68,7 +68,7 @@ if pioutil.is_pio_build():
         uid_value = uuid.uuid4()
         file_key = int(uid_value.hex[0:8], 16)
 
-        xor_crc = 0xEF3D4323;
+        xor_crc = 0xEF3D4323
 
         # the input file is exepcted to be in chunks of 0x800
         # so round the size
@@ -105,13 +105,22 @@ if pioutil.is_pio_build():
 
     # Encrypt ${PROGNAME}.bin and save it as 'update.cbd'
     def encrypt(source, target, env):
-        firmware = open(target[0].path, "rb")
-        update = open(target[0].dir.path + '/update.cbd', "wb")
-        length = os.path.getsize(target[0].path)
+        from pathlib import Path
 
-        encrypt_file(firmware, update, length)
+        fwpath = Path(target[0].path)
+        fwsize = fwpath.stat().st_size
 
-        firmware.close()
-        update.close()
+        enname = board.get("build.crypt_chitu")
+        enpath = Path(target[0].dir.path)
 
-    marlin.add_post_action(encrypt);
+        fwfile = fwpath.open("rb")
+        enfile = (enpath / enname).open("wb")
+
+        print(f"Encrypting {fwpath} to {enname}")
+        encrypt_file(fwfile, enfile, fwsize)
+        fwfile.close()
+        enfile.close()
+        fwpath.unlink()
+
+    marlin.relocate_firmware("0x08008800")
+    marlin.add_post_action(encrypt)
