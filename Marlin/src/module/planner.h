@@ -53,6 +53,10 @@
 #include "motion.h"
 #include "../gcode/queue.h"
 
+#if HAS_FAN
+  #include "temperature.h"
+#endif
+
 #if ENABLED(DELTA)
   #include "delta.h"
 #elif ENABLED(POLARGRAPH)
@@ -265,6 +269,10 @@ typedef struct PlannerBlock {
         steps_per_mm,                       // steps/mm
         acceleration;                       // acceleration mm/sec^2
 
+  #if ENABLED(FTM_CONSTANT_JOLT)
+    float vmax_junction;                    // Original junction speed limit (mm/sec), never modified by recalculate
+  #endif
+
   union {
     abce_ulong_t steps;                     // Step count along each axis
     abce_long_t position;                   // New position to force when this sync block is executed
@@ -305,7 +313,7 @@ typedef struct PlannerBlock {
     uint32_t acceleration_rate;             // Acceleration rate in (2^24 steps)/timer_ticks*s
   #endif
 
-  AxisBits direction_bits;                  // Direction bits set for this block, where 1 is negative motion
+  AxisBits direction_bits;                  // Direction bits set for this block, where 1 is forward motion
 
   #if ENABLED(FT_MOTION)
     ext_distance_t ext_distance_mm;         // The distance traveled in mm along each axis
@@ -345,7 +353,7 @@ typedef struct PlannerBlock {
   #endif
 
   #if HAS_FAN
-    uint8_t fan_speed[FAN_COUNT];
+    uint8_t fan_speed[FAN_COUNT];           // Speeds of all fans
   #endif
 
   #if ENABLED(BARICUDA)
@@ -731,16 +739,6 @@ class Planner {
       static float get_high_e_speed();
     #endif
 
-    // Apply fan speeds
-    #if HAS_FAN
-      static void sync_fan_speeds(uint8_t (&fan_speed)[FAN_COUNT]);
-      #if FAN_KICKSTART_TIME
-        static void kickstart_fan(uint8_t (&fan_speed)[FAN_COUNT], const millis_t &ms, const uint8_t f);
-      #else
-        FORCE_INLINE static void kickstart_fan(uint8_t (&)[FAN_COUNT], const millis_t &, const uint8_t) {}
-      #endif
-    #endif
-
     #if ENABLED(FILAMENT_WIDTH_SENSOR)
       void apply_filament_width_sensor(const int8_t encoded_ratio);
 
@@ -1006,7 +1004,7 @@ class Planner {
      * @param extruder      Optional target extruder (otherwise motion.extruder)
      * @param hints         Optional parameters to aid planner calculations
      *
-     * @return  false if no segment was queued due to cleaning, cold extrusion, full queue, etc...
+     * @return  false if no segment was queued due to cleaning, cold extrusion, full queue, etc.
      */
     static bool buffer_segment(const abce_pos_t &abce
       OPTARG(HAS_DIST_MM_ARG, const xyze_float_t &cart_dist_mm)
@@ -1020,19 +1018,39 @@ class Planner {
      *
      * @brief Add a new linear movement to the buffer.
      * @details The target is cartesian. It's translated to
-     *          delta/scara if needed.
+     *          DELTA/SCARA if needed.
      *
      * @param cart      Target position in mm or degrees
      * @param fr_mm_s   (Target) speed of the move (mm/s)
      * @param extruder  Optional target extruder (otherwise motion.extruder)
      * @param hints     Optional parameters to aid planner calculations
      *
-     * @return  false if no segment was queued due to cleaning, cold extrusion, full queue, etc...
+     * @return  false if no segment was queued due to cleaning, cold extrusion, full queue, etc.
      */
     static bool buffer_line(const xyze_pos_t &cart, const feedRate_t fr_mm_s
       , const uint8_t extruder=motion.extruder
       , const PlannerHints &hints=PlannerHints()
     );
+
+    #if HAS_EXTRUDERS
+      /**
+       * @fn Planner::buffer_e_move
+       *
+       * @brief Add an extruder-only movement relative to the end of the planner queue.
+       * @details Starts from the planner's own end position, so no other axis moves and
+       *          neither leveling nor kinematics need to be applied. Backlash is
+       *          unaffected (no other axis changes direction).
+       *
+       * @param de_mm     Distance to extrude (+) or retract (-) in mm of filament
+       * @param fr_mm_s   (Target) speed of the move (mm/s)
+       * @param extruder  Optional target extruder (otherwise motion.extruder)
+       *
+       * @return  false if no segment was queued due to cleaning, cold extrusion, full queue, etc.
+       */
+      static bool buffer_e_move(const float de_mm, const feedRate_t fr_mm_s
+        , const uint8_t extruder=motion.extruder
+      );
+    #endif
 
     #if ENABLED(DIRECT_STEPPING)
       static void buffer_page(const page_idx_t page_idx, const uint8_t extruder, const uint16_t num_steps);
@@ -1205,20 +1223,43 @@ class Planner {
 
     #if HAS_JUNCTION_DEVIATION
 
-      FORCE_INLINE static void normalize_junction_vector(xyze_float_t &vector) {
-        float magnitude_sq = 0;
-        LOOP_LOGICAL_AXES(idx) if (vector[idx]) magnitude_sq += sq(vector[idx]);
-        vector *= RSQRT(magnitude_sq);
+
+      // TODO: *might* need to increase a bit, e.g., 6.4e-5f
+      #ifndef JD_VECTOR_NORMALIZE_M2_THRESHOLD
+        #define JD_VECTOR_NORMALIZE_M2_THRESHOLD 2.0e-6f
+      #endif
+      // TODO: *might* need to increase a bit, e.g., 8e-3f
+      #ifndef LIMIT_DIVISOR_THRESHOLD
+        #define LIMIT_DIVISOR_THRESHOLD 1.5e-3f
+      #endif
+
+      // TODO: Might change to NOLESS(junction_cos_theta,-0.999968f) in planner.cpp also
+
+      // Return 'true' if the magnitude_sq is insignificant
+      FORCE_INLINE static bool normalize_junction_vector(xyze_float_t &vector) {
+        float magnitude_sq = 0.0f;
+        LOOP_LOGICAL_AXES(axis) if (vector[axis]) magnitude_sq += sq(vector[axis]);
+        // Avoid divide by near-zero (to prevent stuttering).
+        // Threshold consistent with junction_cos_theta.
+        if (magnitude_sq > JD_VECTOR_NORMALIZE_M2_THRESHOLD) {
+          vector *= RSQRT(magnitude_sq);
+          return false;
+        }
+        return true;
       }
 
-      // max_value is block->acceleration
-      FORCE_INLINE static float limit_value_by_axis_maximum(const float max_value, xyze_float_t &unit_vec) {
+      // max_value is block->acceleration here used as our nominal or maximum
+      // unit_vec is the direction of the normal (i.e., perpendicular) acceleration _only_
+      FORCE_INLINE static float limit_jd_acceleration_by_axis_maximum(const float max_value, xyze_float_t &unit_vec) {
         float limit_value = max_value;
-        LOOP_LOGICAL_AXES(idx) {
-          if (unit_vec[idx]) {
-            const uint32_t abs_vec = ABS(unit_vec[idx]);
-            if (limit_value * abs_vec > settings.max_acceleration_mm_per_s2[idx])
-              limit_value = settings.max_acceleration_mm_per_s2[idx] / abs_vec;
+        LOOP_LOGICAL_AXES(axis) {
+          const float abs_vec = ABS(unit_vec[axis]);
+          // Skip small components, avoiding divide by almost-zero
+          if (abs_vec > LIMIT_DIVISOR_THRESHOLD) {  // sqrt of normalize_junction_vector() threshold (for good measure)
+            // i.e., NOMORE(limit_valuw, settings.max_acceleration_mm_per_s2[axis] / abs_vec)
+            //       But we do it this way to avoid division unless limiting.
+            if (limit_value * abs_vec > settings.max_acceleration_mm_per_s2[axis])
+              limit_value = settings.max_acceleration_mm_per_s2[axis] / abs_vec;
           }
         }
         return limit_value;
